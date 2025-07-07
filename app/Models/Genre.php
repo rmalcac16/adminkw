@@ -10,14 +10,4 @@ class Genre extends Model
     protected $fillable = ['title', 'slug', 'name_mal'];
 
     public $timestamps = false;
-
-    public function getNameAttribute()
-    {
-        return $this->title;
-    }
-
-    public function setNameAttribute($value)
-    {
-        $this->attributes['title'] = $value;
-    }
 }

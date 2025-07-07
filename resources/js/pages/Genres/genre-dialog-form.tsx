@@ -25,7 +25,7 @@ export function GenreDialogForm({ genre, triggerType = 'button' }: { genre?: Gen
     const [open, setOpen] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
-        name: genre?.name ?? '',
+        title: genre?.title ?? '',
         name_mal: genre?.name_mal ?? '',
         _method: isEdit ? 'put' : 'post',
     });
@@ -72,14 +72,14 @@ export function GenreDialogForm({ genre, triggerType = 'button' }: { genre?: Gen
                         <div className="grid gap-2">
                             <Label htmlFor="name">{__('genres.form.name')}</Label>
                             <Input
-                                id="name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                placeholder={__('genres.form.name_placeholder')}
+                                id="title"
+                                value={data.title}
+                                onChange={(e) => setData('title', e.target.value)}
+                                placeholder={__('genres.form.title_placeholder')}
                                 required
                                 autoFocus
                             />
-                            {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
+                            {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="name_mal">{__('genres.form.name_mal')}</Label>

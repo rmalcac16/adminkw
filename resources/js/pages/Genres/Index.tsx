@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
+import ClearGenreCacheButton from '@/components/clear-genre-cache-button';
 import { Card, CardContent } from '@/components/ui/card';
 import { GenreData } from '@/types/genre';
 import { DataTable } from '../../components/data-table';
@@ -32,7 +33,10 @@ export default function Index({ genres }: { genres: GenreData[] }) {
                         <h1 className="text-2xl font-semibold">{__('genres.index_page.title')}</h1>
                         <p className="text-sm text-muted-foreground">{__('genres.index_page.description')}</p>
                     </div>
-                    <GenreDialogForm />
+                    <div className="flex items-center space-x-2">
+                        <GenreDialogForm />
+                        <ClearGenreCacheButton />
+                    </div>
                 </div>
 
                 <Card>

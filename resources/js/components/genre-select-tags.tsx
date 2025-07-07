@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Command, CommandInput, CommandItem } from '@/components/ui/command';
@@ -10,39 +12,60 @@ import { useEffect, useMemo, useState } from 'react';
 type Props = {
     allGenres: GenreData[];
     value: string | null;
-    onChange: (value: string) => void;
+    onChange: (value: string | null) => void;
 };
 
 export default function GenresSelectTags({ allGenres, value, onChange }: Props) {
     const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
 
+    console.log('Rendering GenresSelectTags', { allGenres, value, selectedSlugs });
+
+    // Parsear el valor inicial
     useEffect(() => {
-        const safeValue = value ?? '';
-        const slugs = safeValue
+        const slugs = (value ?? '')
             .split(',')
             .map((slug) => slug.trim())
-            .filter(Boolean);
-        setSelectedSlugs(slugs);
+            .filter((slug) => slug.length > 0);
+
+        // Eliminar duplicados
+        const unique = [...new Set(slugs)];
+        setSelectedSlugs(unique);
     }, [value]);
 
+    // Alternar selección de un género
     const toggleGenre = (slug: string) => {
         const updated = selectedSlugs.includes(slug) ? selectedSlugs.filter((s) => s !== slug) : [...selectedSlugs, slug];
 
-        setSelectedSlugs(updated);
-        onChange(updated.join(','));
+        const unique = [...new Set(updated)];
+        setSelectedSlugs(unique);
+        onChange(unique.length > 0 ? unique.join(',') : null);
     };
 
+    // Obtener lista de géneros únicos ordenados por título
+    const orderedGenres = useMemo(() => {
+        const seen = new Set<string>();
+        const uniqueGenres: GenreData[] = [];
+
+        for (const genre of allGenres) {
+            if (genre.slug && !seen.has(genre.slug)) {
+                seen.add(genre.slug);
+                uniqueGenres.push(genre);
+            }
+        }
+
+        return uniqueGenres.sort((a, b) => (a.title ?? '').toLowerCase().localeCompare((b.title ?? '').toLowerCase()));
+    }, [allGenres]);
+
+    // Mapeo de slug → título
     const slugToName = useMemo(() => {
         const map: Record<string, string> = {};
-        allGenres.forEach((g) => {
-            if (g.slug != null && g.name != null) {
-                map[g.slug] = g.name;
-            } else if (g.slug != null) {
-                map[g.slug] = '';
+        for (const genre of orderedGenres) {
+            if (genre.slug) {
+                map[genre.slug] = genre.title ?? genre.slug;
             }
-        });
+        }
         return map;
-    }, [allGenres]);
+    }, [orderedGenres]);
 
     return (
         <div className="space-y-2">
@@ -57,20 +80,14 @@ export default function GenresSelectTags({ allGenres, value, onChange }: Props) 
                         <CommandInput placeholder="Buscar género..." />
                         <ScrollArea className="h-72">
                             <div className="grid grid-cols-2 gap-1 px-2 py-2">
-                                {allGenres.map((genre) => (
-                                    <CommandItem
-                                        key={genre.slug}
-                                        onSelect={() => {
-                                            if (genre.slug) toggleGenre(genre.slug);
-                                        }}
-                                        className="cursor-pointer"
-                                    >
+                                {orderedGenres.map((genre) => (
+                                    <CommandItem key={genre.slug} onSelect={() => genre.slug && toggleGenre(genre.slug)} className="cursor-pointer">
                                         {genre.slug && selectedSlugs.includes(genre.slug) ? (
                                             <Check className="mr-1 h-4 w-4 text-green-600" />
                                         ) : (
                                             <span className="w-5" />
                                         )}
-                                        {genre.name}
+                                        {genre.title}
                                     </CommandItem>
                                 ))}
                             </div>

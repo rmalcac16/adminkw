@@ -50,5 +50,11 @@ return [
         'error' => 'Error al eliminar el género {name}.',
     ],
 
+    'cache' => [
+        'clear_route_not_found' => 'No se encontró la ruta para limpiar la caché de géneros.',
+        'cleared' => 'Caché de géneros limpiada correctamente.',
+        'clear_failed' => 'Error al limpiar la caché de géneros.',
+    ],
+
 
 ];

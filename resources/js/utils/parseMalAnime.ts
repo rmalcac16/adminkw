@@ -30,12 +30,17 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
 
     const type = mediaTypeMap[mal.media_type?.toLowerCase()] || 'TV';
 
-    const genresMatched = (mal.genres || [])
-        .map((g: any) => {
-            const match = allGenres.find((local) => local.name_mal?.toLowerCase() === g.name?.toLowerCase());
-            return match?.slug;
-        })
-        .filter(Boolean);
+    const genresMatched = Array.isArray(mal.genres)
+        ? mal.genres
+              .map((g: any) => {
+                  if (!g?.name) return undefined;
+                  const match = allGenres.find((local) => local.name_mal?.toLowerCase() === g.name?.toLowerCase());
+                  return match?.slug;
+              })
+              .filter(Boolean)
+        : [];
+
+    console.log(genresMatched);
 
     const dayMap: Record<string, number> = {
         monday: 1,

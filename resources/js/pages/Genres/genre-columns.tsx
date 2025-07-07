@@ -14,8 +14,8 @@ export function getGenreColumns(__: (key: string) => string): ColumnDef<GenreDat
             cell: ({ getValue }) => <span className="font-medium">{getValue<number>()}</span>,
         },
         {
-            accessorKey: 'name',
-            header: __('genres.table.name'),
+            accessorKey: 'title',
+            header: __('genres.table.title'),
             enableColumnFilter: true,
             cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
         },

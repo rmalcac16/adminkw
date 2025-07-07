@@ -16,7 +16,7 @@ class StoreGenreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:genres,name',
+            'title' => 'required|string|max:255|unique:genres,title',
             'name_mal' => 'nullable|string|max:255|unique:genres,name_mal',
         ];
     }
@@ -24,9 +24,9 @@ class StoreGenreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => __('genres.name_required'),
-            'name.unique' => __('genres.name_unique'),
-            'name.max' => __('genres.name_max'),
+            'title.required' => __('genres.title_required'),
+            'title.unique' => __('genres.title_unique'),
+            'title.max' => __('genres.title_max'),
             'name_mal.unique' => __('genres.name_mal_unique'),
             'name_mal.max' => __('genres.name_mal_max'),
         ];
@@ -35,10 +35,10 @@ class StoreGenreRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $slug = Str::slug($this->input('name'));
+            $slug = Str::slug($this->input('title'));
 
             if (Genre::where('slug', $slug)->exists()) {
-                $validator->errors()->add('name', __('genres.name_unique'));
+                $validator->errors()->add('title', __('genres.title_unique'));
             }
         });
     }

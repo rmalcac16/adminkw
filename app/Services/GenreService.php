@@ -13,13 +13,13 @@ class GenreService
     public static function getAll(): Collection
     {
         return Cache::rememberForever('genres.all', function () {
-            return Genre::all()->sortBy(fn($genre) => strtolower($genre->name))->values();
+            return Genre::orderByRaw('LOWER(title)')->get();
         });
     }
 
     public function create(array $data): ?Genre
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = Str::slug($data['title']);
         $genre = Genre::create($data);
         Cache::forget('genres.all');
         return $genre;
@@ -27,7 +27,7 @@ class GenreService
 
     public function update(Genre $genre, array $data): ?Genre
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = Str::slug($data['title']);
         $genre->update($data);
         Cache::forget('genres.all');
         return $genre;

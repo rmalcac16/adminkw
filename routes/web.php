@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Animes\AnimeController;
+use App\Http\Controllers\CacheController;
 use App\Http\Controllers\Genres\GenreController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,7 +17,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
     Route::resource('genres', GenreController::class);
     Route::resource('animes', AnimeController::class);
+
+
+    Route::post('/cache/genres/clear', [CacheController::class, 'clearGenreCache'])->name('cache.genres.clear');
 });
+
+
+
 
 
 

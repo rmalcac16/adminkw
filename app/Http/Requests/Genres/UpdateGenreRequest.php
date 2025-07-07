@@ -26,7 +26,7 @@ class UpdateGenreRequest extends FormRequest
         $genre = $this->route('genre');
 
         return [
-            'name' => 'required|string|max:255|unique:genres,name,' . $genre->id,
+            'title' => 'required|string|max:255|unique:genres,title,' . $genre->id,
             'name_mal' => 'nullable|string|unique:genres,name_mal,' . $genre->id,
         ];
     }
@@ -34,9 +34,9 @@ class UpdateGenreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => __('genres.name_required'),
-            'name.unique' => __('genres.name_unique'),
-            'name.max' => __('genres.name_max'),
+            'title.required' => __('genres.title_required'),
+            'title.unique' => __('genres.title_unique'),
+            'title.max' => __('genres.title_max'),
 
             'name_mal.unique' => __('genres.name_mal_unique'),
             'name_mal.max' => __('genres.name_mal_max'),
@@ -49,14 +49,14 @@ class UpdateGenreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $genre = $this->route('genre');
-            $slug = Str::slug($this->input('name'));
+            $slug = Str::slug($this->input('title'));
 
             $slugExists = Genre::where('slug', $slug)
                 ->where('id', '!=', $genre->id)
                 ->exists();
 
             if ($slugExists) {
-                $validator->errors()->add('name', __('genres.name_unique'));
+                $validator->errors()->add('title', __('genres.title_unique'));
             }
         });
     }
