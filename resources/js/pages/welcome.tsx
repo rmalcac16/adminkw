@@ -43,12 +43,14 @@ export default function Welcome() {
                                             {__('welcome.login')}
                                         </Link>
                                     </Button>
-                                    <Button variant="outline" size="lg" asChild>
-                                        <Link href={route('register')}>
-                                            <UserPlus />
-                                            {__('welcome.register')}
-                                        </Link>
-                                    </Button>
+                                    {route().has('register') && (
+                                        <Button variant="outline" size="lg" asChild>
+                                            <Link href={route('register')}>
+                                                <UserPlus />
+                                                {__('welcome.register')}
+                                            </Link>
+                                        </Button>
+                                    )}
                                 </>
                             )}
                         </div>

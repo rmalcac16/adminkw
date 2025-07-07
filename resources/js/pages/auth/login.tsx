@@ -99,12 +99,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </Button>
                 </div>
 
-                <div className="text-center text-sm text-muted-foreground">
-                    {__('auth.no_account')}{' '}
-                    <TextLink href={route('register')} tabIndex={5}>
-                        {__('auth.signup')}
-                    </TextLink>
-                </div>
+                {route().has('register') && (
+                    <div className="text-center text-sm text-muted-foreground">
+                        {__('auth.no_account')}{' '}
+                        <TextLink href={route('register')} tabIndex={5}>
+                            {__('auth.signup')}
+                        </TextLink>
+                    </div>
+                )}
             </form>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
