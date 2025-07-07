@@ -7,7 +7,8 @@ use Illuminate\Support\Str;
 
 class Genre extends Model
 {
-    protected $fillable = ['name', 'slug', 'name_mal'];
+    protected $fillable = ['title', 'slug', 'name_mal'];
+
     public $timestamps = false;
 
     public function getNameAttribute()
