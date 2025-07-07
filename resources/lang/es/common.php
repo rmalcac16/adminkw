@@ -16,4 +16,6 @@ return [
     'update' => "Actualizar",
     'create' => "Crear",
 
+    'search' => "Buscar",
+
 ];

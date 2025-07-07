@@ -155,7 +155,10 @@ return [
         'synced_successfully' => 'Anime sincronizado exitosamente.',
         'loading' => 'Cargando resultados...',
         'search_hint' => 'Escribe al menos 3 caracteres para buscar.',
-        'no_results' => 'No se encontraron resultados.',
+        'or_search_by_id' => '¿O deseas buscar directamente por ID?',
+        'enter_mal_id' => 'Ingresa el ID de MAL...',
+        'invalid_id' => 'ID inválido.',
+        'not_found_id' => 'No se encontró el anime con ese ID.',
     ],
 
 ];
