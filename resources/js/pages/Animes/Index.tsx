@@ -1,0 +1,120 @@
+import { Head, Link, router } from '@inertiajs/react';
+import * as React from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useLang } from '@/hooks/useLang';
+import AppLayout from '@/layouts/app-layout';
+import { Plus } from 'lucide-react';
+
+import { DataTable } from '@/components/data-table';
+import { getAnimeColumns } from './anime-columns';
+import { AnimeDialogGenerate } from './anime-dialog-generate';
+
+export default function Index({ animes, filters }: any) {
+    const { __ } = useLang();
+    const columns = React.useMemo(() => getAnimeColumns(__), [__]);
+
+    const initialSearch = filters?.search ?? '';
+    const [search, setSearch] = React.useState(initialSearch);
+
+    React.useEffect(() => {
+        if (search === initialSearch) return;
+
+        const delayDebounce = setTimeout(() => {
+            router.get(route('animes.index'), { search }, { preserveState: true, replace: true });
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+    }, [search]);
+
+    const breadcrumbs = [
+        {
+            title: __('animes.breadcrumb.index'),
+            href: route('animes.index'),
+        },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={__('animes.index_page.title')} />
+            <div className="space-y-6 p-4">
+                <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-semibold">{__('animes.index_page.title')}</h1>
+                        <p className="text-sm text-muted-foreground">{__('animes.index_page.description')}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button asChild>
+                            <Link href={route('animes.create')}>
+                                <Plus /> {__('animes.create.button')}
+                            </Link>
+                        </Button>
+                        <AnimeDialogGenerate />
+                    </div>
+                </div>
+
+                <Card>
+                    <CardContent className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <Input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder={__('tables.search_placeholder', { field: __('tables.name') })}
+                                className="max-w-sm"
+                            />
+                        </div>
+
+                        <DataTable columns={columns} data={animes.data} enableClientPagination={false} enableClientFiltering={false} />
+
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                                {__('pagination.page_info', {
+                                    current: animes.current_page,
+                                    total: animes.last_page,
+                                })}
+                            </span>
+                            <div className="space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        router.get(
+                                            route('animes.index'),
+                                            {
+                                                search,
+                                                page: animes.current_page - 1,
+                                            },
+                                            { preserveState: true },
+                                        )
+                                    }
+                                    disabled={animes.current_page <= 1}
+                                >
+                                    {__('pagination.previous')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        router.get(
+                                            route('animes.index'),
+                                            {
+                                                search,
+                                                page: animes.current_page + 1,
+                                            },
+                                            { preserveState: true },
+                                        )
+                                    }
+                                    disabled={animes.current_page >= animes.last_page}
+                                >
+                                    {__('pagination.next')}
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </AppLayout>
+    );
+}
