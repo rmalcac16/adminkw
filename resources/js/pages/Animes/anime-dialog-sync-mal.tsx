@@ -154,20 +154,31 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
                                     const year = node.start_date?.split('-')[0] ?? '';
                                     const type = node.media_type?.toUpperCase();
 
+                                    const title = node.title.toLowerCase();
+                                    const keyword = search.toLowerCase().trim();
+                                    const isRelevant = title === keyword || title.includes(keyword) || keyword.includes(title);
+
                                     return (
                                         <div
                                             key={node.id}
-                                            className="cursor-pointer overflow-hidden rounded-lg border transition hover:shadow-md"
+                                            className="relative cursor-pointer overflow-hidden rounded-lg border transition hover:shadow-md"
                                             onClick={() => handleSelect({ node })}
                                         >
-                                            <div className="relative h-40 bg-muted">
+                                            <div className="relative h-48 bg-muted">
                                                 {node.main_picture?.medium ? (
-                                                    <img src={node.main_picture.medium} alt={node.title} className="h-full w-full object-cover" />
+                                                    <img
+                                                        src={node.main_picture.medium}
+                                                        alt={node.title}
+                                                        className="h-full w-full object-cover opacity-80"
+                                                    />
                                                 ) : (
                                                     <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                                                         Sin imagen
                                                     </div>
                                                 )}
+
+                                                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-background/100" />
+
                                                 {type && (
                                                     <div className="absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-[10px] text-white">
                                                         {type}
@@ -178,8 +189,14 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
                                                         {year}
                                                     </div>
                                                 )}
+                                                {isRelevant && (
+                                                    <div className="absolute bottom-2 left-2 rounded bg-primary px-2 py-0.5 text-[10px] text-white shadow">
+                                                        Relevante
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="line-clamp-2 p-2 text-xs">{node.title}</div>
+
+                                            <div className="line-clamp-2 h-10 p-2 text-xs leading-snug">{node.title}</div>
                                         </div>
                                     );
                                 })}
