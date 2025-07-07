@@ -13,7 +13,7 @@ class GenreService
     public static function getAll(): Collection
     {
         return Cache::rememberForever('genres.all', function () {
-            return Genre::orderByRaw('LOWER(name)')->get();
+            return Genre::all()->sortBy(fn($genre) => strtolower($genre->name))->values();
         });
     }
 
