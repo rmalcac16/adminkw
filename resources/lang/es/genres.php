@@ -16,7 +16,7 @@ return [
 
     'table' => [
         'id' => 'ID',
-        'name' => 'Nombre',
+        'title' => 'Nombre',
         'slug' => 'Slug',
         'name_mal' => 'MyAnimeList',
         'actions' => 'Acciones',
