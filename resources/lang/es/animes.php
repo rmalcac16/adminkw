@@ -136,9 +136,9 @@ return [
         'g' => 'Apta para todo público',
         'pg' => 'Apta para mayores de 7 años',
         'pg_13' => 'Apta para mayores de 13 años',
-        'r' => 'Apta para mayores de 16 años',
-        'r_plus' => 'Solo para mayores de 16 años',
-        'rx' => 'Apta para mayores de 18 años',
+        'r' => 'Apta para mayores de 17 años',
+        'r_plus' => 'Solo para mayores de 17 años',
+        'rx' => 'Puede tener desnudez ligera',
         'x' => 'Solo para adultos',
     ],
 
