@@ -15,7 +15,6 @@ import { useLang } from '@/hooks/useLang';
 import { AnimeData } from '@/types/anime';
 import { useForm } from '@inertiajs/react';
 import { Trash2, TriangleAlert } from 'lucide-react';
-import { toast } from 'sonner';
 
 export function AnimeDialogDelete({ anime }: { anime: AnimeData }) {
     const { __ } = useLang();
@@ -24,11 +23,6 @@ export function AnimeDialogDelete({ anime }: { anime: AnimeData }) {
     const handleDelete = () => {
         destroy(route('animes.destroy', anime.id), {
             preserveScroll: true,
-            onSuccess: () => {
-                toast(__('animes.delete.success', { name: anime.name || __('common.unknown') }), {
-                    icon: <Trash2 className="text-red-400" />,
-                });
-            },
         });
     };
 

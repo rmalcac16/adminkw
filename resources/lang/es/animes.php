@@ -27,6 +27,8 @@ return [
         'title' => 'Crear anime',
         'description' => 'Agrega un nuevo anime.',
         'button' => 'Crear anime',
+        'success' => 'El anime :name se creó exitosamente.',
+        'error' => 'Error al crear el anime. Por favor, inténtalo de nuevo.',
     ],
 
     'edit' => [
@@ -35,11 +37,16 @@ return [
         'button' => 'Actualizar anime',
     ],
 
+    'update' => [
+        'success' => 'El anime :name se actualizó exitosamente.',
+        'error' => 'Error al actualizar el anime. Por favor, inténtalo de nuevo.',
+    ],
+
     'delete' => [
         'title' => 'Eliminar anime',
         'description' => '¿Estás seguro de que deseas eliminar este anime?',
         'button' => 'Eliminar anime',
-        'success' => 'Anime eliminado exitosamente.',
+        'success' => 'El anime se eliminó exitosamente.',
     ],
 
     'generate' => [

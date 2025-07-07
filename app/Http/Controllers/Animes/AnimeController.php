@@ -53,18 +53,18 @@ class AnimeController extends Controller
     public function store(StoreAnimeRequest $request)
     {
         $this->animeService->create($request->validated());
-        return to_route('animes.index');
+        return to_route('animes.index')->with('success', __('animes.create.success', ['name' => $request->name]));
     }
 
     public function update(UpdateAnimeRequest $request, Anime $anime)
     {
         $this->animeService->update($anime, $request->validated());
-        return to_route('animes.index');
+        return to_route('animes.index')->with('success', __('animes.update.success', ['name' => $anime->name]));
     }
 
     public function destroy(Anime $anime)
     {
         $this->animeService->delete($anime);
-        return to_route('animes.index');
+        return to_route('animes.index')->with('success', __('animes.delete.success'));
     }
 }

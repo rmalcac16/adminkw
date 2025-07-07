@@ -16,7 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLang } from '@/hooks/useLang';
 import { GenreData } from '@/types/genre';
 import { parseMalAnime } from '@/utils/parseMalAnime';
-import { Check, Loader2, RotateCcw } from 'lucide-react';
+import { Check, Loader2, RotateCcw, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
@@ -30,6 +30,7 @@ type Props = {
 export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
     const { __ } = useLang();
 
+    const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [rawResponse, setRawResponse] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -37,13 +38,7 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
     const [malIdInput, setMalIdInput] = useState('');
 
     useEffect(() => {
-        if (anime?.name) {
-            setSearch(anime.name);
-        }
-    }, [anime]);
-
-    useEffect(() => {
-        if (search.length < 3 || hasSynced) {
+        if (search.length < 3 || hasSynced || !isOpen) {
             setRawResponse(null);
             return;
         }
@@ -53,18 +48,22 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
             fetch(route('mal.search') + '?q=' + encodeURIComponent(search))
                 .then((res) => res.json())
                 .then(setRawResponse)
-                .catch((err) => console.error(err))
+                .catch((err) => {
+                    console.error('Error buscando en MAL:', err);
+                    setRawResponse({ error: true });
+                })
                 .finally(() => setLoading(false));
         }, 600);
 
         return () => clearTimeout(timer);
-    }, [search, hasSynced]);
+    }, [search, hasSynced, isOpen]);
 
     const handleSelect = (item: any) => {
         const parsed = parseMalAnime(item.node, genres);
         setData?.((prev: any) => ({ ...prev, ...parsed }));
         toast.success(__('animes.sync_mal.synced_successfully'), { icon: <Check /> });
         setHasSynced(true);
+        setIsOpen(false);
     };
 
     const handleManualId = async () => {
@@ -83,6 +82,7 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
             setData?.((prev: any) => ({ ...prev, ...parsed }));
             toast.success(__('animes.sync_mal.synced_successfully'), { icon: <Check /> });
             setHasSynced(true);
+            setIsOpen(false);
         } catch {
             toast.error(__('animes.sync_mal.not_found_id'));
         } finally {
@@ -91,7 +91,18 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
     };
 
     return (
-        <Dialog>
+        <Dialog
+            open={isOpen}
+            onOpenChange={(open) => {
+                setIsOpen(open);
+                if (open) {
+                    setRawResponse(null);
+                    setHasSynced(false);
+                    setSearch(anime?.name ?? '');
+                    setMalIdInput('');
+                }
+            }}
+        >
             <DialogTrigger asChild>
                 <div className="flex h-full items-end justify-end">
                     <Button type="button" variant="secondary">
@@ -108,15 +119,28 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <Input
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            setHasSynced(false);
-                        }}
-                        placeholder={__('animes.sync_mal.search_placeholder')}
-                        className="text-sm"
-                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Input
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setHasSynced(false);
+                            }}
+                            placeholder={__('animes.sync_mal.search_placeholder')}
+                            className="min-w-[200px] flex-1 text-sm"
+                        />
+                        <Input
+                            type="number"
+                            value={malIdInput}
+                            onChange={(e) => setMalIdInput(e.target.value)}
+                            placeholder={__('animes.sync_mal.enter_mal_id')}
+                            className="w-[180px]"
+                            onKeyDown={(e) => e.key === 'Enter' && handleManualId()}
+                        />
+                        <Button size="icon" onClick={handleManualId} disabled={!malIdInput.trim() || isNaN(Number(malIdInput))}>
+                            <Search className="h-4 w-4" />
+                        </Button>
+                    </div>
 
                     {loading ? (
                         <div className="flex items-center justify-center py-6 text-muted-foreground">
@@ -144,14 +168,16 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
                                                         Sin imagen
                                                     </div>
                                                 )}
-
-                                                <div className="absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-[10px] text-white">
-                                                    {type}
-                                                </div>
-
-                                                <div className="absolute top-2 right-2 rounded bg-black/70 px-2 py-0.5 text-[10px] text-white">
-                                                    {year}
-                                                </div>
+                                                {type && (
+                                                    <div className="absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-[10px] text-white">
+                                                        {type}
+                                                    </div>
+                                                )}
+                                                {year && (
+                                                    <div className="absolute top-2 right-2 rounded bg-black/70 px-2 py-0.5 text-[10px] text-white">
+                                                        {year}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="line-clamp-2 p-2 text-xs">{node.title}</div>
                                         </div>
@@ -162,25 +188,6 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
                     ) : (
                         <div className="py-6 text-center text-sm text-muted-foreground">
                             {search.length >= 3 ? __('animes.sync_mal.no_results') : __('animes.sync_mal.search_hint')}
-                        </div>
-                    )}
-
-                    {search.length >= 3 && !loading && (!rawResponse?.data?.length || rawResponse.error) && (
-                        <div className="space-y-3 border-t pt-4">
-                            <div className="text-sm font-medium">{__('animes.sync_mal.or_search_by_id')}</div>
-                            <div className="flex items-center gap-2">
-                                <Input
-                                    type="number"
-                                    value={malIdInput}
-                                    onChange={(e) => setMalIdInput(e.target.value)}
-                                    placeholder={__('animes.sync_mal.enter_mal_id')}
-                                    className="w-56"
-                                    onKeyDown={(e) => e.key === 'Enter' && handleManualId()}
-                                />
-                                <Button onClick={handleManualId} disabled={loading}>
-                                    {__('common.search')}
-                                </Button>
-                            </div>
                         </div>
                     )}
                 </div>

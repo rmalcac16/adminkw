@@ -11,6 +11,7 @@ import { useLang } from '@/hooks/useLang';
 import { AnimeData } from '@/types/anime';
 import { GenreData } from '@/types/genre';
 import { useForm } from '@inertiajs/react';
+import { Edit3, Plus } from 'lucide-react';
 import { FormEventHandler } from 'react';
 import { toast } from 'sonner';
 import { AnimeDialogSyncMal } from './anime-dialog-sync-mal';
@@ -67,7 +68,17 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
         <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="flex sm:items-end sm:justify-end">
                 <Button type="submit" disabled={processing}>
-                    {type === 'edit' ? __('animes.edit.button') : __('animes.create.button')}
+                    {type === 'edit' ? (
+                        <>
+                            <Edit3 />
+                            {__('common.update')}
+                        </>
+                    ) : (
+                        <>
+                            <Plus />
+                            {__('common.create')}
+                        </>
+                    )}
                 </Button>
             </div>
 

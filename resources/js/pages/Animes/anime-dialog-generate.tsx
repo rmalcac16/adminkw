@@ -91,7 +91,6 @@ export function AnimeDialogGenerate() {
             post(route('animes.store'), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(__('animes.generate.success'));
                     if (data.tmdb_id) {
                         setImportedAnimeIds((prev) => [...prev, data.tmdb_id!]);
                     }

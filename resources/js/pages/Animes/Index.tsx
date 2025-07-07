@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -9,15 +9,24 @@ import AppLayout from '@/layouts/app-layout';
 import { Plus } from 'lucide-react';
 
 import { DataTable } from '@/components/data-table';
+import { toast } from 'sonner';
 import { getAnimeColumns } from './anime-columns';
 import { AnimeDialogGenerate } from './anime-dialog-generate';
 
 export default function Index({ animes, filters }: any) {
+    const { props } = usePage();
+    const flash = props.flash as { success?: string; error?: string };
+
     const { __ } = useLang();
     const columns = React.useMemo(() => getAnimeColumns(__), [__]);
 
     const initialSearch = filters?.search ?? '';
     const [search, setSearch] = React.useState(initialSearch);
+
+    React.useEffect(() => {
+        if (flash.success) toast.success(flash.success);
+        if (flash.error) toast.error(flash.error);
+    }, [flash]);
 
     React.useEffect(() => {
         if (search === initialSearch) return;
