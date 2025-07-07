@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
             'global',
             'common',
             'animes',
-            'table'
+            'tables'
         ]);
 
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');

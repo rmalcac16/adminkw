@@ -57,4 +57,12 @@ return [
     ],
 
 
+    'form' => [
+        'title' => 'Nombre',
+        'title_placeholder' => 'Ingrese el nombre del género',
+        'name_mal' => 'Nombre en MyAnimeList',
+        'name_mal_placeholder' => 'Ingrese el nombre del género en MyAnimeList',
+    ]
+
+
 ];

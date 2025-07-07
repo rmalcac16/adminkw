@@ -13,4 +13,7 @@ return [
     'clear_cache' => "Limpiar caché",
     'clear' => "Limpiar",
 
+    'update' => "Actualizar",
+    'create' => "Crear",
+
 ];

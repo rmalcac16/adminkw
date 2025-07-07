@@ -18,21 +18,16 @@ type Props = {
 export default function GenresSelectTags({ allGenres, value, onChange }: Props) {
     const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
 
-    console.log('Rendering GenresSelectTags', { allGenres, value, selectedSlugs });
-
-    // Parsear el valor inicial
     useEffect(() => {
         const slugs = (value ?? '')
             .split(',')
             .map((slug) => slug.trim())
             .filter((slug) => slug.length > 0);
 
-        // Eliminar duplicados
         const unique = [...new Set(slugs)];
         setSelectedSlugs(unique);
     }, [value]);
 
-    // Alternar selección de un género
     const toggleGenre = (slug: string) => {
         const updated = selectedSlugs.includes(slug) ? selectedSlugs.filter((s) => s !== slug) : [...selectedSlugs, slug];
 
@@ -41,7 +36,6 @@ export default function GenresSelectTags({ allGenres, value, onChange }: Props) 
         onChange(unique.length > 0 ? unique.join(',') : null);
     };
 
-    // Obtener lista de géneros únicos ordenados por título
     const orderedGenres = useMemo(() => {
         const seen = new Set<string>();
         const uniqueGenres: GenreData[] = [];
@@ -56,7 +50,6 @@ export default function GenresSelectTags({ allGenres, value, onChange }: Props) 
         return uniqueGenres.sort((a, b) => (a.title ?? '').toLowerCase().localeCompare((b.title ?? '').toLowerCase()));
     }, [allGenres]);
 
-    // Mapeo de slug → título
     const slugToName = useMemo(() => {
         const map: Record<string, string> = {};
         for (const genre of orderedGenres) {

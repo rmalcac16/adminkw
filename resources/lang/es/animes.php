@@ -87,6 +87,8 @@ return [
         'aired_placeholder' => 'Seleccionar fecha',
         'type' => 'Tipo',
         'type_placeholder' => 'Seleccionar tipo',
+        'genres' => 'Géneros',
+        'genres_placeholder' => 'Seleccionar géneros',
         'status' => 'Estado',
         'status_placeholder' => 'Seleccionar estado',
         'premiered' => 'Temporada',

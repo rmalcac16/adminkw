@@ -67,7 +67,10 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
 
     const handleSelect = (item: any) => {
         const parsed = parseMalAnime(item.node, genres);
-        setData?.(parsed);
+        setData?.((prev: any) => ({
+            ...prev,
+            ...parsed,
+        }));
         toast.success(__('animes.sync_mal.synced_successfully'), {
             icon: <Check />,
         });
@@ -95,7 +98,7 @@ export function AnimeDialogSyncMal({ anime, setData, genres }: Props) {
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
-                            setHasSynced(false); // reinicia búsqueda si el usuario edita
+                            setHasSynced(false);
                         }}
                         placeholder={__('animes.sync_mal.search_placeholder')}
                     />

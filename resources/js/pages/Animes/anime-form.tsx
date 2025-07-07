@@ -1,3 +1,4 @@
+import AlternativeNamesInputTags from '@/components/alternative-names-input-tag';
 import { DatePicker } from '@/components/date-picker';
 import GenresSelectTags from '@/components/genre-select-tags';
 import RelatedInputTags from '@/components/related-input-tags';
@@ -95,10 +96,9 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                 </div>
                 <div className="flex flex-col gap-2 lg:col-span-6">
                     <Label htmlFor="name_alternative">{__('animes.form.name_alternative')}</Label>
-                    <Input
-                        id="name_alternative"
+                    <AlternativeNamesInputTags
                         value={data.name_alternative}
-                        onChange={(e) => setData('name_alternative', e.target.value)}
+                        onChange={(value) => setData('name_alternative', value)}
                         placeholder={__('animes.form.name_alternative_placeholder')}
                     />
                     {errors.name_alternative && <p className="text-xs text-red-400">{errors.name_alternative}</p>}
@@ -300,7 +300,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
                 <div className="col-span-12 flex flex-col gap-2 md:col-span-6">
                     <Label htmlFor="genres">{__('animes.form.genres')}</Label>
-                    <GenresSelectTags allGenres={genres} value={data.genres} onChange={(val) => setData('genres', val)} />
+                    <GenresSelectTags allGenres={genres} value={data.genres ?? ''} onChange={(val) => setData('genres', val ?? '')} />
                     {errors.genres && <p className="text-xs text-red-400">{errors.genres}</p>}
                 </div>
 

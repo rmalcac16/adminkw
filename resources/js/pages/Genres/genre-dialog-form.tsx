@@ -70,7 +70,7 @@ export function GenreDialogForm({ genre, triggerType = 'button' }: { genre?: Gen
 
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">{__('genres.form.name')}</Label>
+                            <Label htmlFor="title">{__('genres.form.title')}</Label>
                             <Input
                                 id="title"
                                 value={data.title}

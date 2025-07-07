@@ -10,7 +10,7 @@ type Props = {
     placeholder?: string;
 };
 
-export default function RelatedInputTags({ value, onChange, placeholder = 'Ingresa IDs separados por coma' }: Props) {
+export default function AlternativeNamesInputTags({ value, onChange, placeholder = 'Ingresa nombres alternativos separados por coma' }: Props) {
     const [inputValue, setInputValue] = useState('');
     const [items, setItems] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -20,17 +20,15 @@ export default function RelatedInputTags({ value, onChange, placeholder = 'Ingre
             ? value
                   .split(',')
                   .map((v) => v.trim())
-                  .filter((v) => /^\d+$/.test(v))
+                  .filter(Boolean)
             : [];
         setItems(values);
     }, [value]);
 
     const updateItems = (newItems: string[]) => {
-        const numericOnly = newItems.filter((s) => /^\d+$/.test(s));
-        const merged = Array.from(new Set([...items, ...numericOnly]));
-        const sorted = merged.sort((a, b) => Number(a) - Number(b));
-        setItems(sorted);
-        onChange(sorted.join(','));
+        const merged = Array.from(new Set([...items, ...newItems.map((s) => s.trim()).filter(Boolean)]));
+        setItems(merged);
+        onChange(merged.join(','));
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,8 +62,8 @@ export default function RelatedInputTags({ value, onChange, placeholder = 'Ingre
         }
     };
 
-    const removeItem = (id: string) => {
-        const filtered = items.filter((item) => item !== id);
+    const removeItem = (item: string) => {
+        const filtered = items.filter((i) => i !== item);
         setItems(filtered);
         onChange(filtered.join(','));
     };
@@ -82,7 +80,7 @@ export default function RelatedInputTags({ value, onChange, placeholder = 'Ingre
                         type="button"
                         className="ml-1 hover:text-red-500"
                         onClick={(e) => {
-                            e.stopPropagation(); // evitar focus del input
+                            e.stopPropagation();
                             removeItem(item);
                         }}
                     >
