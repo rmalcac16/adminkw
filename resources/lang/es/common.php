@@ -28,6 +28,7 @@ return [
         'clear_route_not_found' => "Ruta para limpiar la caché de {type} no encontrada.",
         'clear' => "Limpiar caché",
         'clearing' => "Limpiando caché...",
+        'clear_all' => "Limpiar todo",
     ],
 
     'latest' => "Último"
