@@ -8,14 +8,27 @@ return [
     'delete' => "Eliminar",
     'save' => "Guardar",
 
-    'clearing_cache' => "Limpiando caché...",
-    'clearing' => "Limpiando...",
-    'clear_cache' => "Limpiar caché",
-    'clear' => "Limpiar",
-
     'update' => "Actualizar",
     'create' => "Crear",
 
     'search' => "Buscar",
 
+    'yes' => "Sí",
+    'no' => "No",
+
+
+    'animes' => "Animes",
+    'genres' => "Géneros",
+    'servers' => "Servidores",
+    'episodes' => "Episodios",
+
+    'cache' => [
+        'cleared' => "Caché de {type} limpiada correctamente.",
+        'clear_failed' => "Error al limpiar la caché de {type}.",
+        'clear_route_not_found' => "Ruta para limpiar la caché de {type} no encontrada.",
+        'clear' => "Limpiar caché",
+        'clearing' => "Limpiando caché...",
+    ],
+
+    'latest' => "Último"
 ];

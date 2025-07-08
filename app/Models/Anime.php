@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Anime extends Model
 {
@@ -34,14 +35,8 @@ class Anime extends Model
         'tmdb_id',
     ];
 
-    public function getStatusLabelAttribute(): string
+    public function episodes(): HasMany
     {
-        return match ($this->status) {
-            0 => 'Finalizado',
-            1 => 'En emisión',
-            2 => 'En pausa',
-            3 => 'Próximamente',
-            default => 'Desconocido',
-        };
+        return $this->hasMany(Episode::class);
     }
 }

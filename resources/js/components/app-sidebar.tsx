@@ -2,32 +2,40 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { useLang } from '@/hooks/useLang';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { File, LayoutGrid, ListFilter } from 'lucide-react';
+import { File, LayoutGrid, ListFilter, Server } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Animes',
-        href: route().has('animes.index') ? route('animes.index') : '#',
-        icon: File,
-    },
-    {
-        title: 'Generos',
-        href: route().has('genres.index') ? route('genres.index') : '#',
-        icon: ListFilter,
-    },
-];
-
-const footerNavItems: NavItem[] = [];
-
 export function AppSidebar() {
+    const { __ } = useLang();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: __('common.animes'),
+            href: route().has('animes.index') ? route('animes.index') : '#',
+            icon: File,
+        },
+        {
+            title: __('common.genres'),
+            href: route().has('genres.index') ? route('genres.index') : '#',
+            icon: ListFilter,
+        },
+        {
+            title: __('common.servers'),
+            href: route().has('servers.index') ? route('servers.index') : '#',
+            icon: Server,
+        },
+    ];
+
+    const footerNavItems: NavItem[] = [];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

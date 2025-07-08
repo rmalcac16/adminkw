@@ -2,13 +2,13 @@
 
 import {
     ColumnDef,
-    ColumnFiltersState,
-    SortingState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    Row,
+    SortingState,
     useReactTable,
 } from '@tanstack/react-table';
 import * as React from 'react';
@@ -21,8 +21,8 @@ import { useLang } from '@/hooks/useLang';
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    filterFields?: string[]; // los campos sobre los cuales filtrar con el input
 
-    // Si quieres desactivar funcionalidades específicas, puedes pasar estos opcionales
     enableClientPagination?: boolean;
     enableClientSorting?: boolean;
     enableClientFiltering?: boolean;
@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
     columns,
     data,
+    filterFields = [],
     enableClientPagination = true,
     enableClientSorting = true,
     enableClientFiltering = true,
@@ -38,20 +39,28 @@ export function DataTable<TData, TValue>({
     const { __ } = useLang();
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [globalFilter, setGlobalFilter] = React.useState('');
 
     const table = useReactTable({
         data,
         columns,
+        state: {
+            sorting,
+            globalFilter,
+        },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: enableClientPagination ? getPaginationRowModel() : undefined,
         getSortedRowModel: enableClientSorting ? getSortedRowModel() : undefined,
         getFilteredRowModel: enableClientFiltering ? getFilteredRowModel() : undefined,
-        onSortingChange: enableClientSorting ? setSorting : undefined,
-        onColumnFiltersChange: enableClientFiltering ? setColumnFilters : undefined,
-        state: {
-            ...(enableClientSorting && { sorting }),
-            ...(enableClientFiltering && { columnFilters }),
+        globalFilterFn: (row: Row<TData>, _columnId: string, filterValue: string) => {
+            if (!filterFields.length) return true;
+
+            return filterFields.some((field) => {
+                const value = row.getValue(field);
+                return String(value).toLowerCase().includes(filterValue.toLowerCase());
+            });
         },
     });
 
@@ -63,8 +72,8 @@ export function DataTable<TData, TValue>({
                         placeholder={__('tables.search_placeholder', {
                             field: __('tables.name'),
                         })}
-                        value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-                        onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+                        value={globalFilter}
+                        onChange={(event) => setGlobalFilter(event.target.value)}
                         className="max-w-sm"
                     />
                 </div>

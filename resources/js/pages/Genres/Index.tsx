@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-import ClearGenreCacheButton from '@/components/clear-genre-cache-button';
+import ClearCacheButton from '@/components/clear-cache-button';
 import { Card, CardContent } from '@/components/ui/card';
 import { GenreData } from '@/types/genre';
 import { DataTable } from '../../components/data-table';
@@ -35,13 +35,13 @@ export default function Index({ genres }: { genres: GenreData[] }) {
                     </div>
                     <div className="flex items-center space-x-2">
                         <GenreDialogForm />
-                        <ClearGenreCacheButton />
+                        <ClearCacheButton routeName="cache.genres.clear" labelKey="genres" />
                     </div>
                 </div>
 
                 <Card>
                     <CardContent>
-                        <DataTable columns={columns} data={genres} />
+                        <DataTable columns={columns} data={genres} filterFields={['title', 'slug', 'name_mal']} />
                     </CardContent>
                 </Card>
             </div>

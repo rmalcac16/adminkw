@@ -2,6 +2,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AnimeData } from '@/types/anime';
+import { shortenText } from '@/utils/text';
 import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { CheckIcon, ClockIcon, Edit2, HelpCircleIcon, LoaderIcon, PauseIcon } from 'lucide-react';
@@ -54,27 +55,15 @@ export function getAnimeColumns(__: (key: string) => string): ColumnDef<AnimeDat
                 const name_alternative = row.original.name_alternative;
 
                 return (
-                    <div className="max-w-[300px] space-y-0.5">
-                        <div className="max-w-[300px] text-sm font-medium">
-                            {name.length > 50 ? (
-                                <span title={name}>
-                                    {name.slice(0, 25)}…{name.slice(-10)}
-                                </span>
-                            ) : (
-                                <span>{name}</span>
-                            )}
-                        </div>
+                    <Link href={route().has('episodes.index') ? route('episodes.index', { anime: row.original.id }) : '#'}>
+                        <div className="max-w-[330px] space-y-0.5">
+                            <div className="max-w-[330px] text-sm font-medium">{shortenText(name)}</div>
 
-                        <div className="max-w-[300px] text-xs text-muted-foreground">
-                            {name_alternative && name_alternative.length > 30 ? (
-                                <span title={name_alternative}>
-                                    {name_alternative.slice(0, 15)}…{name_alternative.slice(-10)}
-                                </span>
-                            ) : (
-                                <span>{name_alternative || '—'}</span>
-                            )}
+                            <div className="line-clamp-1 max-w-[330px] text-xs overflow-ellipsis text-muted-foreground">
+                                {name_alternative ? shortenText(name_alternative) : __('common.no_alternative_name')}
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 );
             },
         },
