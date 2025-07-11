@@ -16,6 +16,7 @@ class GenreController extends Controller
     public function __construct(GenreService $genreService)
     {
         $this->genreService = $genreService;
+        syncLangFiles(['genres']);
     }
 
     public function index()

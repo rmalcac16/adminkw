@@ -19,6 +19,7 @@ class EpisodeController extends Controller
     public function __construct(EpisodeService $episodeService)
     {
         $this->episodeService = $episodeService;
+        syncLangFiles(['episodes']);
     }
 
     public function index(Anime $anime)

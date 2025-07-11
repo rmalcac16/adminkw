@@ -29,7 +29,7 @@ export default function Index({ anime, episodes }: { anime: AnimeData; episodes:
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: __('animes.breadcrumb.index'),
+            title: __('episodes.breadcrumb.animes'),
             href: route().has('animes.index') ? route('animes.index') : '#',
         },
         {
@@ -45,7 +45,7 @@ export default function Index({ anime, episodes }: { anime: AnimeData; episodes:
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
                         <h1 className="text-2xl font-semibold">{__('episodes.index_page.title')}</h1>
-                        <p className="text-sm text-muted-foreground">{__('episodes.index_page.description')}</p>
+                        <p className="text-sm text-muted-foreground">{__('episodes.index_page.description', { anime: anime.name })}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                         <EpisodeDialogForm anime={anime} />

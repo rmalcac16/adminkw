@@ -21,6 +21,7 @@ class PlayerController extends Controller
     {
         $this->playerService = $playerService;
         $this->serverService = $serverService;
+        syncLangFiles(['players']);
     }
 
     public function index(Anime $anime, Episode $episode)
@@ -36,14 +37,6 @@ class PlayerController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StorePlayerRequest $request, Anime $anime, Episode $episode)
@@ -54,22 +47,6 @@ class PlayerController extends Controller
             return redirect()->back()->with('success', __('players.store.success'));
         }
         return redirect()->back()->withErrors(__('players.store.error'));
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**

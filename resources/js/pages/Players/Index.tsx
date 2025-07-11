@@ -41,7 +41,7 @@ export default function Index({
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: __('animes.breadcrumb.index'),
+            title: __('players.breadcrumb.animes'),
             href: route().has('animes.index') ? route('animes.index') : '#',
         },
         {
@@ -49,7 +49,7 @@ export default function Index({
             href: route().has('episodes.index') ? route('episodes.index', { anime: anime.id }) : '#',
         },
         {
-            title: __('episodes.breadcrumb.episode_number', { number: episode.number }),
+            title: __('players.breadcrumb.episode_number', { number: episode.number }),
             href: route().has('players.index') ? route('players.index', { anime: anime.id, episode: episode.id }) : '#',
         },
     ];

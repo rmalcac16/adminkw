@@ -2,6 +2,8 @@
 
 return [
     'breadcrumb' => [
+        'animes' => 'Animes',
+        'episode_number' => 'Episodio {number}',
         'index' => 'Reproductores',
         'create' => 'Crear Reproductor',
         'edit' => 'Editar Reproductor',

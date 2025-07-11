@@ -3,6 +3,7 @@
 return [
 
     'breadcrumb' => [
+        'animes' => 'Animes',
         'index' => 'Episodios',
         'create' => 'Crear Episodio',
         'edit' => 'Editar Episodio',
@@ -34,23 +35,6 @@ return [
         'success' => 'Episodio "{number}" eliminado exitosamente.',
     ],
 
-    'form' => [
-        'number' => 'Número del Episodio',
-        'number_placeholder' => 'Ingrese el número del episodio',
-    ],
-
-
-    'table' => [
-        'id' => 'ID',
-        'number' => 'Número',
-        'views' => 'Vistas',
-        'views_app' => 'Vistas (App)',
-        'episode' => 'Episodio',
-        'created_at' => 'Creado',
-        'updated_at' => 'Actualizado',
-        'actions' => 'Acciones',
-    ],
-
     'store' => [
         'success' => 'El episodio ":number" ha sido creado exitosamente.',
         'error' => 'Error al crear el episodio ":number". Por favor, inténtelo de nuevo.',
@@ -66,6 +50,21 @@ return [
         'error' => 'Error al eliminar el episodio ":number". Por favor, inténtelo de nuevo.',
     ],
 
+    'form' => [
+        'number' => 'Número del Episodio',
+        'number_placeholder' => 'Ingrese el número del episodio',
+    ],
+
+    'table' => [
+        'id' => 'ID',
+        'number' => 'Número',
+        'views' => 'Vistas',
+        'views_app' => 'Vistas (App)',
+        'episode' => 'Episodio',
+        'created_at' => 'Creado',
+        'updated_at' => 'Actualizado',
+        'actions' => 'Acciones',
+    ],
 
     'validation' => [
         'number' => [
@@ -76,6 +75,21 @@ return [
         ],
         'update' => [
             'failed' => 'Error al actualizar el episodio. Por favor, inténtelo de nuevo.',
+        ],
+    ],
+
+    'animes' => [
+        'breadcrumb' => [
+            'index' => 'Animes',
+            'show' => 'Ver Anime',
+        ],
+        'index_page' => [
+            'title' => 'Animes',
+            'description' => 'Lista de animes disponibles en la plataforma.',
+        ],
+        'show' => [
+            'title' => 'Detalles del Anime',
+            'description' => 'Información detallada del anime seleccionado.',
         ],
     ],
 

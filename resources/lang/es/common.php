@@ -33,4 +33,8 @@ return [
         'clear_failed_all' => "Error al limpiar toda la caché de {type}.",
     ],
     'latest' => "Último",
+    'platform' => "Plataforma",
+    'settings' => "Configuraciones",
+    'profile' => "Perfil",
+    'logout' => "Cerrar sesión",
 ];
