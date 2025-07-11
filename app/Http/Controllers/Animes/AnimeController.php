@@ -20,6 +20,7 @@ class AnimeController extends Controller
     {
         $this->animeService = $service;
         $this->genreService = $genreService;
+        syncLangFiles(['animes']);
     }
 
     public function index(Request $request, AnimeService $animeService)

@@ -113,7 +113,7 @@ export function getAnimeColumns(__: (key: string) => string): ColumnDef<AnimeDat
         },
         {
             id: 'actions',
-            header: __('genres.table.actions'),
+            header: __('animes.table.actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="icon" className="h-8 w-8">
