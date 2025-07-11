@@ -29,6 +29,8 @@ class UpdateServerRequest extends FormRequest
             'show_on_web_desktop' => ['sometimes', 'boolean'],
             'show_on_web_mobile' => ['sometimes', 'boolean'],
             'show_on_app' => ['sometimes', 'boolean'],
+            'domains' => ['sometimes', 'nullable', 'array'],
+            'domains.*' => ['string', 'max:255'],
         ];
     }
 }

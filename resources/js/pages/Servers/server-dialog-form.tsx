@@ -1,3 +1,4 @@
+import { TagInput } from '@/components/tag-input';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -32,6 +33,7 @@ export function ServerDialogForm({ server, triggerType = 'button' }: { server?: 
         show_on_web_desktop: server?.show_on_web_desktop ?? true,
         show_on_web_mobile: server?.show_on_web_mobile ?? true,
         show_on_app: server?.show_on_app ?? true,
+        domains: server?.domains ?? [],
         _method: isEdit ? 'put' : 'post',
     });
 
@@ -135,6 +137,11 @@ export function ServerDialogForm({ server, triggerType = 'button' }: { server?: 
                                     {__('servers.form.app')}
                                 </ToggleGroupItem>
                             </ToggleGroup>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="domains">{__('players.form.domains')}</Label>
+                            <TagInput value={data.domains} onChange={(tags) => setData('domains', tags)} />
+                            {errors.domains && <p className="text-sm text-red-500">{errors.domains}</p>}
                         </div>
                     </div>
 

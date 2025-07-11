@@ -29,6 +29,8 @@ class StoreServerRequest extends FormRequest
             'show_on_web_desktop' => ['required', 'boolean'],
             'show_on_web_mobile' => ['required', 'boolean'],
             'show_on_app' => ['required', 'boolean'],
+            'domains' => ['nullable', 'array'],
+            'domains.*' => ['string', 'max:255'],
         ];
     }
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -14,17 +15,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLang } from '@/hooks/useLang';
+import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
 import { useForm } from '@inertiajs/react';
 import { Pencil, PlusIcon } from 'lucide-react';
-import { useState } from 'react';
+import { FormEventHandler, useState } from 'react';
+import { route } from 'ziggy-js';
 
 export function EpisodeDialogForm({
-    animeId,
+    anime,
     episode,
     triggerType = 'button',
 }: {
-    animeId: number;
+    anime: AnimeData;
     episode?: EpisodeData;
     triggerType?: 'icon' | 'button';
 }) {
@@ -33,33 +36,40 @@ export function EpisodeDialogForm({
     const [open, setOpen] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
-        number: episode?.number ?? '',
-        _method: isEdit ? 'put' : 'post',
+        number: episode?.number ?? 1,
+        _method: isEdit ? 'PUT' : 'POST',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        const onSuccess = () => {
-            reset();
-            setOpen(false);
+        const url = isEdit ? route('episodes.update', { anime: anime, episode: episode!.id }) : route('episodes.store', { anime: anime });
+
+        const options = {
+            preserveScroll: true,
+            forceFormData: true,
+            onSuccess: () => {
+                setOpen(false);
+                reset();
+            },
+            onError: (errors: Record<string, string>) => {
+                console.log('Errores:', errors);
+            },
         };
 
-        const url = isEdit ? route('episodes.update', { anime: animeId, episode: episode!.id }) : route('episodes.store', animeId);
-
-        isEdit ? put(url, { onSuccess }) : post(url, { onSuccess });
+        isEdit ? post(url, options) : post(url, options);
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {triggerType === 'button' ? (
-                    <Button>
+                    <Button className="cursor-pointer" disabled={processing}>
                         <PlusIcon />
                         {__('episodes.create.button')}
                     </Button>
                 ) : (
-                    <Button variant="secondary" size="icon" className="size-8">
+                    <Button variant="secondary" size="icon" className="size-8 cursor-pointer" disabled={processing}>
                         <Pencil />
                     </Button>
                 )}
@@ -79,10 +89,11 @@ export function EpisodeDialogForm({
                                 id="number"
                                 type="number"
                                 value={data.number}
-                                onChange={(e) => setData('number', parseInt(e.target.value))}
+                                min={1}
+                                onChange={(e) => setData('number', Number(e.target.value))}
                                 required
                             />
-                            {errors.number && <p className="text-xs text-red-400">{errors.number}</p>}
+                            <InputError className="text-xs" message={errors.number} />
                         </div>
                     </div>
 

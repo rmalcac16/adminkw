@@ -4,7 +4,7 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
     const title = mal.title || '';
     const alternatives = [...(mal.alternative_titles?.synonyms || []), mal.alternative_titles?.en, mal.alternative_titles?.ja]
         .filter(Boolean)
-        .join(', ');
+        .join(',');
 
     let status = '1';
     if (mal.status === 'finished_airing') {
@@ -39,8 +39,6 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
               })
               .filter(Boolean)
         : [];
-
-    console.log(genresMatched);
 
     const dayMap: Record<string, number> = {
         monday: 1,
@@ -89,7 +87,7 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
         popularity,
         type,
         mal_id: mal.id,
-        genres: genresMatched.join(', '),
+        genres: genresMatched.join(','),
         broadcast,
         premiered,
     };

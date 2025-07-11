@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
 import { formatDate } from '@/utils/dates';
 import { ColumnDef } from '@tanstack/react-table';
@@ -6,7 +7,7 @@ import { MonitorSmartphoneIcon, Tv2Icon } from 'lucide-react';
 import { EpisodeDialogDelete } from './episode-dialog-delete';
 import { EpisodeDialogForm } from './episode-dialog-form';
 
-export function getEpisodeColumns(__: (key: string) => string): ColumnDef<EpisodeData>[] {
+export function getEpisodeColumns(__: (key: string) => string, anime: AnimeData): ColumnDef<EpisodeData>[] {
     return [
         {
             accessorKey: 'id',
@@ -63,7 +64,7 @@ export function getEpisodeColumns(__: (key: string) => string): ColumnDef<Episod
             header: __('episodes.table.actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <EpisodeDialogForm animeId={row.original.anime_id} episode={row.original} triggerType="icon" />
+                    <EpisodeDialogForm anime={anime} episode={row.original} triggerType="icon" />
                     <EpisodeDialogDelete episode={row.original} />
                 </div>
             ),

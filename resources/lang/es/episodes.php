@@ -6,6 +6,7 @@ return [
         'index' => 'Episodios',
         'create' => 'Crear Episodio',
         'edit' => 'Editar Episodio',
+        'episode_number' => 'Episodio {number}',
     ],
 
     'index_page' => [
@@ -17,18 +18,20 @@ return [
         'title' => 'Crear Episodio',
         'description' => 'Formulario para crear un nuevo episodio.',
         'button' => 'Crear Episodio',
-        'success' => 'Episodio ":number" creado exitosamente.',
+        'success' => 'Episodio "{number}" creado exitosamente.',
     ],
 
     'edit' => [
         'title' => 'Editar Episodio',
         'description' => 'Formulario para editar el episodio seleccionado.',
         'button' => 'Actualizar Episodio',
-        'success' => 'Episodio ":number" actualizado exitosamente.',
+        'success' => 'Episodio "{number}" actualizado exitosamente.',
     ],
 
     'delete' => [
-        'success' => 'Episodio ":number" eliminado exitosamente.',
+        'title' => 'Eliminar Episodio',
+        'description' => '¿Está seguro de que desea eliminar el episodio "{number}"? Esta acción no se puede deshacer.',
+        'success' => 'Episodio "{number}" eliminado exitosamente.',
     ],
 
     'form' => [
@@ -61,6 +64,19 @@ return [
     'destroy' => [
         'success' => 'El episodio ":number" ha sido eliminado exitosamente.',
         'error' => 'Error al eliminar el episodio ":number". Por favor, inténtelo de nuevo.',
+    ],
+
+
+    'validation' => [
+        'number' => [
+            'required' => 'El número del episodio es obligatorio.',
+            'integer' => 'El número del episodio debe ser un número entero.',
+            'min' => 'El número del episodio debe ser al menos :min.',
+            'unique' => 'Ya existe un episodio con este número en el anime.',
+        ],
+        'update' => [
+            'failed' => 'Error al actualizar el episodio. Por favor, inténtelo de nuevo.',
+        ],
     ],
 
 ];

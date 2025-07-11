@@ -7,4 +7,5 @@ export interface ServerData {
     show_on_web_desktop: boolean;
     show_on_web_mobile: boolean;
     show_on_app: boolean;
+    domains: string[] | null;
 }

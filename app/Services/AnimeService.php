@@ -27,6 +27,14 @@ class AnimeService
         return $query->orderBy('id', 'desc')->paginate($perPage)->appends($filters);
     }
 
+
+    public function find(Anime $anime): ?Anime
+    {
+
+        $anime->rating = $anime->rating ? $this->getRatingKey($anime->rating) : null;
+        return $anime;
+    }
+
     public function create(array $data): Anime
     {
         $originalName = $data['name'] ?? '';
@@ -37,6 +45,10 @@ class AnimeService
             $data['slug'] = $this->generateUniqueSlug($data['name']);
         } else {
             $data['slug'] = $this->generateUniqueSlug($data['slug']);
+        }
+
+        if (!empty($data['rating'])) {
+            $data['rating'] = $this->translateRating($data['rating']);
         }
 
         return Anime::create($data);
@@ -53,6 +65,10 @@ class AnimeService
             $data['slug'] = $this->generateUniqueSlug($data['name'] ?? $anime->name, $anime->id);
         } else {
             $data['slug'] = $this->generateUniqueSlug($data['slug'], $anime->id);
+        }
+
+        if (!empty($data['rating'])) {
+            $data['rating'] = $this->translateRating($data['rating']);
         }
 
         $anime->update($data);
@@ -96,5 +112,17 @@ class AnimeService
         }
 
         return $name;
+    }
+
+
+    protected function translateRating(string $key): ?string
+    {
+        return __('animes.ratings.' . $key);
+    }
+
+    protected function getRatingKey(string $label): ?string
+    {
+        $ratings = __('animes.ratings');
+        return array_search($label, $ratings, true);
     }
 }

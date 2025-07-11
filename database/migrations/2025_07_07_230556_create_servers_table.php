@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('show_on_web_desktop')->default(true);
             $table->boolean('show_on_web_mobile')->default(true);
             $table->boolean('show_on_app')->default(true);
+            $table->json('domains')->nullable();
             $table->timestamps();
         });
     }

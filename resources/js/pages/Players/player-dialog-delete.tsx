@@ -12,33 +12,33 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useLang } from '@/hooks/useLang';
-import { EpisodeData } from '@/types/episode';
+import { PlayerData } from '@/types/player';
 import { useForm } from '@inertiajs/react';
 import { Trash2, TriangleAlert } from 'lucide-react';
 
-export function EpisodeDialogDelete({ episode }: { episode: EpisodeData }) {
+export function PlayerDialogDelete({ animeId, episodeId, player }: { animeId: number; episodeId: number; player: PlayerData }) {
     const { __ } = useLang();
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
-        destroy(route('episodes.destroy', { anime: episode.anime_id, episode: episode.id }), {
+        destroy(route('players.destroy', { anime: animeId, episode: episodeId, player: player.id }), {
             preserveScroll: true,
         });
     };
 
     return (
         <AlertDialog>
-            <AlertDialogTrigger asChild className="cursor-pointer">
+            <AlertDialogTrigger asChild>
                 <Button variant="destructive" size="icon" className="size-8" disabled={processing}>
                     <Trash2 />
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{__('episodes.delete.title', { number: episode.number })}</AlertDialogTitle>
+                    <AlertDialogTitle>{__('players.delete.title', { id: player.id })}</AlertDialogTitle>
                     <AlertDialogDescription className="flex flex-col items-center space-y-6">
                         <TriangleAlert className="size-24 text-yellow-500" />
-                        {__('episodes.delete.description', { number: episode.number })}
+                        {__('players.delete.description', { server: player.server?.title ?? '—' })}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

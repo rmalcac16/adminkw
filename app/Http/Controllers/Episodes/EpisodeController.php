@@ -19,14 +19,8 @@ class EpisodeController extends Controller
     public function __construct(EpisodeService $episodeService)
     {
         $this->episodeService = $episodeService;
-
-        syncLangFiles('episodes');
     }
 
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Anime $anime)
     {
         $episodes = $this->episodeService->getAll($anime);
@@ -37,40 +31,24 @@ class EpisodeController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreEpisodeRequest $request, Anime $anime)
     {
         $validatedData = $request->validated();
-
-        $this->episodeService->create($validatedData, $anime);
-
-        return redirect()->route('episodes.index', ['anime' => $anime])
-            ->with('success', __('episodes.store.success', ['number' => $validatedData['number']]));
+        $createdEpisode = $this->episodeService->create($anime, $validatedData);
+        return back()->with('success', __('episodes.store.success', ['number' => $createdEpisode->number]));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(UpdateEpisodeRequest $request, Anime $anime, Episode $episode)
     {
         $validatedData = $request->validated();
-
-        $this->episodeService->update($episode, $validatedData, $anime);
-
-        return redirect()->route('episodes.index', ['anime' => $anime])
-            ->with('success', __('episodes.update.success', ['number' => $episode->number]));
+        $updatedEpisode = $this->episodeService->update($anime, $episode, $validatedData);
+        return back()->with('success', __('episodes.update.success', ['number' => $updatedEpisode->number]));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Anime $anime, Episode $episode)
     {
-        $this->episodeService->delete($episode);
-
-        return redirect()->route('episodes.index', ['anime' => $anime])
-            ->with('success', __('episodes.destroy.success', ['number' => $episode->number]));
+        $this->episodeService->delete($anime, $episode);
+        return back()->with('success', __('episodes.destroy.success', ['number' => $episode->number]));
     }
 }

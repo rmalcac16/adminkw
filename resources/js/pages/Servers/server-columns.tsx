@@ -98,6 +98,27 @@ export function getServerColumns(__: (key: string) => string): ColumnDef<ServerD
             },
         },
         {
+            accessorKey: 'domains',
+            header: __('players.table.domains'),
+            cell: ({ row }) => {
+                const domains = row.original.domains ?? [];
+
+                if (!domains.length) {
+                    return <span className="text-sm text-muted-foreground">—</span>;
+                }
+
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {domains.map((domain: string, i: number) => (
+                            <Badge key={i} variant="secondary" className="cursor-pointer">
+                                {domain}
+                            </Badge>
+                        ))}
+                    </div>
+                );
+            },
+        },
+        {
             id: 'actions',
             header: __('servers.table.actions'),
             cell: ({ row }) => (

@@ -21,11 +21,13 @@ import { useLang } from '@/hooks/useLang';
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-    filterFields?: string[]; // los campos sobre los cuales filtrar con el input
+    filterFields?: string[];
 
     enableClientPagination?: boolean;
     enableClientSorting?: boolean;
     enableClientFiltering?: boolean;
+
+    getRowLink?: (row: TData) => string | undefined;
 }
 
 export function DataTable<TData, TValue>({
@@ -35,6 +37,7 @@ export function DataTable<TData, TValue>({
     enableClientPagination = true,
     enableClientSorting = true,
     enableClientFiltering = true,
+    getRowLink,
 }: DataTableProps<TData, TValue>) {
     const { __ } = useLang();
 
@@ -95,13 +98,29 @@ export function DataTable<TData, TValue>({
 
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
+                            table.getRowModel().rows.map((row) => {
+                                const rowLink = getRowLink?.(row.original);
+
+                                return (
+                                    <TableRow
+                                        key={row.id}
+                                        onClick={() => rowLink && (window.location.href = rowLink)}
+                                        className={rowLink ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell
+                                                key={cell.id}
+                                                onClick={(e) => {
+                                                    // Evita que los botones de acción activen el click del row
+                                                    if (cell.column.id === 'actions') e.stopPropagation();
+                                                }}
+                                            >
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                );
+                            })
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">

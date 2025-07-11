@@ -5,10 +5,16 @@ return [
     'generate' => "Generar",
     'processing' => "Procesando...",
     'cancel' => "Cancelar",
+    'cancelling' => "Cancelando...",
     'delete' => "Eliminar",
+    'deleting' => "Eliminando...",
     'save' => "Guardar",
-
+    'saving' => "Guardando...",
+    'save_changes' => "Guardar cambios",
+    'saving_changes' => "Guardando cambios...",
     'update' => "Actualizar",
+    'updating' => "Actualizando...",
+
     'create' => "Crear",
 
     'search' => "Buscar",
@@ -21,6 +27,7 @@ return [
     'genres' => "Géneros",
     'servers' => "Servidores",
     'episodes' => "Episodios",
+    'players' => "Reproductores",
 
     'cache' => [
         'cleared' => "Caché de {type} limpiada correctamente.",
@@ -29,6 +36,7 @@ return [
         'clear' => "Limpiar caché",
         'clearing' => "Limpiando caché...",
         'clear_all' => "Limpiar todo",
+        'clear_failed_all' => "Error al limpiar toda la caché de {type}.",
     ],
 
     'latest' => "Último"

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Anime;
+use App\Models\Episode;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\RedirectResponse;
 
@@ -36,6 +37,20 @@ class CacheController extends Controller
 
         if (in_array(config('cache.default'), ['redis', 'memcached'])) {
             Cache::tags(['episodes'])->forget($cacheKey);
+        } else {
+            Cache::forget($cacheKey);
+        }
+
+        return redirect()->back();
+    }
+
+
+    public function clearPlayerCache(Anime $anime, Episode $episode): RedirectResponse
+    {
+        $cacheKey = "players.episodes.{$episode->id}.animes.{$anime->id}";
+
+        if (in_array(config('cache.default'), ['redis', 'memcached'])) {
+            Cache::tags(['players'])->forget($cacheKey);
         } else {
             Cache::forget($cacheKey);
         }

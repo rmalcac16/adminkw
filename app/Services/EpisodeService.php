@@ -38,14 +38,14 @@ class EpisodeService
         );
     }
 
-    public function create(array $data, Anime $anime): Episode
+    public function create(Anime $anime, array $data): Episode
     {
         $episode = $anime->episodes()->create($data);
         $this->flushCache($anime);
         return $episode;
     }
 
-    public function update(Episode $episode, array $data, Anime $anime): Episode
+    public function update(Anime $anime, Episode $episode, array $data): Episode
     {
         $anime->episodes()->findOrFail($episode->id);
         $episode->update($data);
@@ -53,9 +53,9 @@ class EpisodeService
         return $episode;
     }
 
-    public function delete(Episode $episode): bool
+    public function delete(Anime $anime, Episode $episode): bool
     {
-        $anime = $episode->anime;
+        $anime->episodes()->findOrFail($episode->id);
         $deleted = $episode->delete();
         if ($deleted) {
             $this->flushCache($anime);

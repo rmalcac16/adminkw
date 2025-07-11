@@ -19,6 +19,7 @@ class Server extends Model
         'show_on_web_desktop',
         'show_on_web_mobile',
         'show_on_app',
+        'domains',
     ];
 
     protected $casts = [
@@ -26,5 +27,11 @@ class Server extends Model
         'show_on_web_desktop' => 'boolean',
         'show_on_web_mobile' => 'boolean',
         'show_on_app' => 'boolean',
+        'domains' => 'array',
     ];
+
+    public function players()
+    {
+        return $this->hasMany(Player::class);
+    }
 }

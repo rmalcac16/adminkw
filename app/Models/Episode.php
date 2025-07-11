@@ -21,4 +21,9 @@ class Episode extends Model
     {
         return $this->belongsTo(Anime::class);
     }
+
+    public function players()
+    {
+        return $this->hasMany(Player::class);
+    }
 }

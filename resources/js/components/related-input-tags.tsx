@@ -8,9 +8,10 @@ type Props = {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
+    validate?: (item: string) => boolean; // función opcional de validación
 };
 
-export default function RelatedInputTags({ value, onChange, placeholder = 'Ingresa IDs separados por coma' }: Props) {
+export default function InputTags({ value, onChange, placeholder = 'Ingresa valores separados por coma o enter', validate }: Props) {
     const [inputValue, setInputValue] = useState('');
     const [items, setItems] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -20,26 +21,26 @@ export default function RelatedInputTags({ value, onChange, placeholder = 'Ingre
             ? value
                   .split(',')
                   .map((v) => v.trim())
-                  .filter((v) => /^\d+$/.test(v))
+                  .filter((v) => v.length > 0)
             : [];
         setItems(values);
     }, [value]);
 
     const updateItems = (newItems: string[]) => {
-        const numericOnly = newItems.filter((s) => /^\d+$/.test(s));
-        const merged = Array.from(new Set([...items, ...numericOnly]));
-        const sorted = merged.sort((a, b) => Number(a) - Number(b));
-        setItems(sorted);
-        onChange(sorted.join(','));
+        const cleaned = newItems
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0 && !items.includes(s))
+            .filter((s) => (validate ? validate(s) : true));
+
+        const merged = [...items, ...cleaned];
+        setItems(merged);
+        onChange(merged.join(','));
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         if (val.includes(',')) {
-            const parts = val
-                .split(',')
-                .map((s) => s.trim())
-                .filter(Boolean);
+            const parts = val.split(',').map((s) => s.trim());
             updateItems(parts);
             setInputValue('');
         } else {
@@ -64,25 +65,25 @@ export default function RelatedInputTags({ value, onChange, placeholder = 'Ingre
         }
     };
 
-    const removeItem = (id: string) => {
-        const filtered = items.filter((item) => item !== id);
+    const removeItem = (item: string) => {
+        const filtered = items.filter((i) => i !== item);
         setItems(filtered);
         onChange(filtered.join(','));
     };
 
     return (
         <div
-            className="flex cursor-text flex-wrap items-center gap-2 rounded-md border border-input px-3 py-2 text-xs"
+            className="flex cursor-text flex-wrap items-center gap-2 rounded-md border border-input px-3 py-2 text-sm"
             onClick={() => inputRef.current?.focus()}
         >
             {items.map((item) => (
-                <Badge key={item} variant="secondary" className="flex cursor-default items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                <Badge key={item} variant="secondary" className="flex items-center gap-1">
                     {item}
                     <button
                         type="button"
-                        className="ml-1 hover:text-red-500"
+                        className="ml-1 text-muted-foreground hover:text-red-500"
                         onClick={(e) => {
-                            e.stopPropagation(); // evitar focus del input
+                            e.stopPropagation();
                             removeItem(item);
                         }}
                     >
@@ -94,7 +95,7 @@ export default function RelatedInputTags({ value, onChange, placeholder = 'Ingre
             <input
                 ref={inputRef}
                 type="text"
-                className="min-w-[100px] flex-1 border-none bg-transparent focus:outline-none"
+                className="min-w-[100px] flex-1 border-none bg-transparent text-sm focus:outline-none"
                 value={inputValue}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}

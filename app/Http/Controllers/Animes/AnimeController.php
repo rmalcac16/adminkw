@@ -43,6 +43,7 @@ class AnimeController extends Controller
 
     public function edit(Anime $anime)
     {
+        $anime = $this->animeService->find($anime);
         $genres = $this->genreService->getAll();
         return Inertia::render('Animes/Edit', [
             'genres' => $genres,
