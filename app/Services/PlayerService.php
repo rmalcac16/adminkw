@@ -26,50 +26,45 @@ class PlayerService
     {
         $key = $this->getCacheKey($anime, $episode);
 
+        $query = fn() => Player::where('episode_id', $episode->id)
+            ->orderBy('languaje')
+            ->orderByDesc('id')
+            ->with(['server', 'episode'])
+            ->get();
+
         if ($this->supportsTags()) {
-            return Cache::tags($this->cacheTag)->rememberForever($key, function () use ($episode) {
-                return $episode->players()
-                    ->orderBy('languaje')
-                    ->orderBy('id', 'desc')
-                    ->with(['server', 'episode'])
-                    ->get();
-            });
+            return Cache::tags($this->cacheTag)->rememberForever($key, $query);
         }
 
-        return Cache::rememberForever($key, function () use ($episode) {
-            return $episode->players()
-                ->orderBy('languaje')
-                ->orderBy('id', 'desc')
-                ->with(['server', 'episode'])
-                ->get();
-        });
+        return Cache::rememberForever($key, $query);
     }
-
 
     public function create(Anime $anime, Episode $episode, array $data): ?Player
     {
         $player = $episode->players()->create($data);
-        $this->flushEpisodeCache($anime, $episode);
+        $this->flushPlayerCache($anime, $episode);
         return $player;
     }
 
     public function update(Anime $anime, Episode $episode, Player $player, array $data): ?Player
     {
         $player->update($data);
-        $this->flushEpisodeCache($anime, $episode);
+        $this->flushPlayerCache($anime, $episode);
         return $player;
     }
 
     public function delete(Anime $anime, Episode $episode, Player $player): bool
     {
         $deleted = $player->delete();
+
         if ($deleted) {
-            $this->flushEpisodeCache($anime, $episode);
+            $this->flushPlayerCache($anime, $episode);
         }
+
         return $deleted;
     }
 
-    protected function flushEpisodeCache(Anime $anime, Episode $episode): void
+    protected function flushPlayerCache(Anime $anime, Episode $episode): void
     {
         $cacheKey = "players.episodes.{$episode->id}.animes.{$anime->id}";
 
