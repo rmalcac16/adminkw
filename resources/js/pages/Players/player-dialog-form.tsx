@@ -1,5 +1,8 @@
 'use client';
 
+import InputError from '@/components/input-error';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,9 +12,8 @@ import { useLang } from '@/hooks/useLang';
 import { PlayerData } from '@/types/player';
 import { ServerData } from '@/types/server';
 import { useForm } from '@inertiajs/react';
-import { Edit2, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { CheckCircle, Edit2, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 export function PlayerDialogForm({
     servers,
@@ -30,7 +32,7 @@ export function PlayerDialogForm({
     const { __ } = useLang();
 
     const [open, setOpen] = useState(false);
-    const [isValidDomain, setIsValidDomain] = useState(true);
+    const [isValidDomain, setIsValidDomain] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         code: player?.code || '',
@@ -47,10 +49,6 @@ export function PlayerDialogForm({
 
             const isMatch = allowedDomains.some((domain) => url.hostname.includes(domain));
             setIsValidDomain(isMatch);
-
-            if (!isMatch) {
-                toast.warning(__('players.validation.invalid_domain') || 'El dominio no pertenece al servidor seleccionado');
-            }
         } catch {
             setIsValidDomain(false);
         }
@@ -58,11 +56,6 @@ export function PlayerDialogForm({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!isValidDomain) {
-            toast.error(__('players.validation.blocked_submission') || 'Dominio inválido, no puedes guardar.');
-            return;
-        }
 
         const onSuccess = () => {
             reset();
@@ -91,7 +84,7 @@ export function PlayerDialogForm({
 
     const handleCodeChange = (value: string) => {
         setData('code', value);
-        validateCodeDomain(value, Number(data.server_id));
+        validateCodeDomain(value, typeof data.server_id === 'string' ? parseInt(data.server_id) : data.server_id);
     };
 
     const handleServerChange = (value: string) => {
@@ -99,12 +92,6 @@ export function PlayerDialogForm({
         setData('server_id', serverId);
         validateCodeDomain(data.code, serverId);
     };
-
-    useEffect(() => {
-        if (errors.languaje && errors.languaje.toLowerCase().includes('ya existe un reproductor')) {
-            toast.warning(errors.languaje);
-        }
-    }, [errors.languaje]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -163,15 +150,41 @@ export function PlayerDialogForm({
                         </div>
                     </div>
 
+                    <Alert className="flex items-center justify-between">
+                        <div>
+                            <AlertTitle>{__('players.validation.domain_title')}</AlertTitle>
+                            <AlertDescription>
+                                {(() => {
+                                    const selectedServer = servers.find((s) => s.id === data.server_id);
+                                    return selectedServer && selectedServer.domains && selectedServer.domains.length > 0 ? (
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            {selectedServer.domains.map((domain) => (
+                                                <Badge key={domain}>{domain}</Badge>
+                                            ))}
+                                        </div>
+                                    ) : null;
+                                })()}
+                            </AlertDescription>
+                        </div>
+                        <div className="flex h-full items-center">
+                            {isValidDomain ? (
+                                <CheckCircle className="text-green-500" size={24} />
+                            ) : (
+                                <CheckCircle className="text-red-500" size={24} />
+                            )}
+                        </div>
+                    </Alert>
+
                     <div className="grid gap-2">
                         <Label htmlFor="code">{__('players.form.code')}</Label>
                         <Input
+                            type="url"
                             value={data.code}
                             onChange={(e) => handleCodeChange(e.target.value)}
                             placeholder={__('players.form.code_placeholder')}
                             required
                         />
-                        {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
+                        <InputError message={errors.code} className="text-xs" />
                     </div>
 
                     <DialogFooter>

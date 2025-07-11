@@ -73,6 +73,10 @@ return [
         'invalid_domain' => 'Dominio inválido',
         'code_required' => 'El código es obligatorio',
         'code_invalid' => 'El código no es válido',
+        'domain_title' => 'Dominios del Reproductor',
+        'code' => [
+            'unique' => 'El código ya está en uso para este episodio y servidor.',
+        ],
     ]
 
 ];

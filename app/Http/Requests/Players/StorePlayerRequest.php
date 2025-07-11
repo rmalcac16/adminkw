@@ -59,8 +59,7 @@ class StorePlayerRequest extends FormRequest
                 'max:512',
                 Rule::unique('players')->where(function ($query) {
                     return $query->where('episode_id', $this->episode_id)
-                        ->where('server_id', $this->server_id)
-                        ->where('languaje', $this->languaje);
+                        ->where('server_id', $this->server_id);
                 }),
             ],
             'server_id' => [
@@ -74,7 +73,6 @@ class StorePlayerRequest extends FormRequest
             'languaje' => [
                 'required',
                 'integer',
-                // Eliminamos la regla unique aquí para permitir diferentes lenguajes
             ],
         ];
     }
@@ -82,20 +80,13 @@ class StorePlayerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'code.unique' => 'players.validation.code.unique',
-            'server_id.required' => 'players.validation.server_id.required',
-            'server_id.exists' => 'players.validation.server_id.exists',
-            'episode_id.required' => 'players.validation.episode_id.required',
-            'episode_id.exists' => 'players.validation.episode_id.exists',
-            'languaje.required' => 'players.validation.languaje.required',
-            'languaje.integer' => 'players.validation.languaje.integer',
-        ];
-    }
-
-    public function attributes()
-    {
-        return [
-            'languaje' => 'idioma',
+            'code.unique' => __('players.validation.code.unique'),
+            'server_id.required' => __('players.validation.server_id.required'),
+            'server_id.exists' => __('players.validation.server_id.exists'),
+            'episode_id.required' => __('players.validation.episode_id.required'),
+            'episode_id.exists' => __('players.validation.episode_id.exists'),
+            'languaje.required' => __('players.validation.languaje.required'),
+            'languaje.integer' => __('players.validation.languaje.integer'),
         ];
     }
 }

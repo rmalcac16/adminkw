@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('server_id')->constrained()->cascadeOnDelete();
             $table->foreignId('episode_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+
+            $table->unique(['code', 'episode_id', 'server_id'], 'unique_code_episode_server');
         });
     }
 
