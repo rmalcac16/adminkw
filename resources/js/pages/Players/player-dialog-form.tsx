@@ -13,7 +13,7 @@ import { PlayerData } from '@/types/player';
 import { ServerData } from '@/types/server';
 import { useForm } from '@inertiajs/react';
 import { CheckCircle, Edit2, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function PlayerDialogForm({
     servers,
@@ -41,18 +41,25 @@ export function PlayerDialogForm({
         episode_id: episodeId,
     });
 
-    const validateCodeDomain = (code: string, serverId: number) => {
-        try {
-            const url = new URL(code);
-            const currentServer = servers.find((s) => s.id === serverId);
-            const allowedDomains = currentServer?.domains || [];
+    // Validación automática con useEffect
+    useEffect(() => {
+        const validate = () => {
+            try {
+                const url = new URL(data.code);
+                const currentServer = servers.find((s) => s.id === Number(data.server_id));
+                const allowedDomains = currentServer?.domains || [];
 
-            const isMatch = allowedDomains.some((domain) => url.hostname.includes(domain));
-            setIsValidDomain(isMatch);
-        } catch {
-            setIsValidDomain(false);
+                const isMatch = allowedDomains.some((domain) => url.hostname.includes(domain));
+                setIsValidDomain(isMatch);
+            } catch {
+                setIsValidDomain(false);
+            }
+        };
+
+        if (data.code && data.server_id) {
+            validate();
         }
-    };
+    }, [data.code, data.server_id, servers]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,6 +69,11 @@ export function PlayerDialogForm({
             setOpen(false);
         };
 
+        const options = {
+            preserveScroll: true,
+            onSuccess,
+        };
+
         if (isEditing) {
             put(
                 route('players.update', {
@@ -69,28 +81,17 @@ export function PlayerDialogForm({
                     episode: episodeId,
                     player: player.id,
                 }),
-                {
-                    preserveScroll: true,
-                    onSuccess,
-                },
+                options,
             );
         } else {
-            post(route('players.store', { anime: animeId, episode: episodeId }), {
-                preserveScroll: true,
-                onSuccess,
-            });
+            post(
+                route('players.store', {
+                    anime: animeId,
+                    episode: episodeId,
+                }),
+                options,
+            );
         }
-    };
-
-    const handleCodeChange = (value: string) => {
-        setData('code', value);
-        validateCodeDomain(value, typeof data.server_id === 'string' ? parseInt(data.server_id) : data.server_id);
-    };
-
-    const handleServerChange = (value: string) => {
-        const serverId = parseInt(value);
-        setData('server_id', serverId);
-        validateCodeDomain(data.code, serverId);
     };
 
     return (
@@ -117,7 +118,7 @@ export function PlayerDialogForm({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="grid gap-2">
                             <Label htmlFor="server_id">{__('players.form.server')}</Label>
-                            <Select value={String(data.server_id)} onValueChange={handleServerChange}>
+                            <Select value={String(data.server_id)} onValueChange={(value) => setData('server_id', parseInt(value))}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('players.form.server_placeholder')} />
                                 </SelectTrigger>
@@ -155,8 +156,8 @@ export function PlayerDialogForm({
                             <AlertTitle>{__('players.validation.domain_title')}</AlertTitle>
                             <AlertDescription>
                                 {(() => {
-                                    const selectedServer = servers.find((s) => s.id === data.server_id);
-                                    return selectedServer && selectedServer.domains && selectedServer.domains.length > 0 ? (
+                                    const selectedServer = servers.find((s) => s.id === Number(data.server_id));
+                                    return selectedServer?.domains?.length ? (
                                         <div className="flex flex-wrap items-center gap-2">
                                             {selectedServer.domains.map((domain) => (
                                                 <Badge key={domain}>{domain}</Badge>
@@ -178,9 +179,8 @@ export function PlayerDialogForm({
                     <div className="grid gap-2">
                         <Label htmlFor="code">{__('players.form.code')}</Label>
                         <Input
-                            type="url"
                             value={data.code}
-                            onChange={(e) => handleCodeChange(e.target.value)}
+                            onChange={(e) => setData('code', e.target.value)}
                             placeholder={__('players.form.code_placeholder')}
                             required
                         />

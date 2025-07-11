@@ -38,6 +38,17 @@ return [
         'button' => 'Eliminar Reproductor',
     ],
 
+
+    'store' => [
+        'success' => 'Reproductor creado correctamente.',
+        'error' => 'Error al crear el reproductor. Por favor, inténtalo de nuevo.',
+    ],
+
+    'update' => [
+        'success' => 'Reproductor actualizado correctamente.',
+        'error' => 'Error al actualizar el reproductor. Por favor, inténtalo de nuevo.',
+    ],
+
     'destroy' => [
         'success' => 'Reproductor eliminado correctamente.',
         'error' => 'Error al eliminar el reproductor. Por favor, inténtalo de nuevo.',
