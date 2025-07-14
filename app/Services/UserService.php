@@ -17,7 +17,7 @@ class UserService
     public function paginate(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = User::query()
-            ->select(['id', 'name', 'email', 'isPremium', 'created_at', 'verified_at']);
+            ->select(['id', 'name', 'email', 'isPremium', 'created_at', 'email_verified_at']);
 
         if (!empty($filters['search'])) {
             $search = trim($filters['search']);
