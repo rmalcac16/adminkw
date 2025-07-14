@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -14,33 +16,36 @@ class UserService
 
     public function paginate(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = User::query();
+        $query = User::query()
+            ->select(['id', 'name', 'email', 'isPremium', 'created_at', 'verified_at']);
 
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where('name', 'like', "%{$search}%");
-            $query->orWhere('email', 'like', "%{$search}%");
+            $search = trim($filters['search']);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
         }
 
-        return $query->orderBy('id', 'desc')->paginate($perPage)->appends($filters);
+        return $query
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->appends($filters);
     }
+
 
     public function kpis(): array
     {
-        $totalUsers = User::count();
-        $premiumUsers = User::where('isPremium', true)->count();
-        $verifiedEmails = User::where('email_verified_at', '!=', null)->count();
-        $recentUsers = User::where('created_at', '>=', now()->subDays(30))->count();
+        $kpis = Cache::remember('user_kpis', now()->addMinutes(5), function () {
+            return [
+                'total' => DB::table('users')->count(),
+                'premium' => DB::table('users')->where('isPremium', true)->count(),
+                'verified' => DB::table('users')->whereNotNull('email_verified_at')->count(),
+                'recent' => DB::table('users')->where('created_at', '>=', now()->subDays(30))->count(),
+            ];
+        });
 
-
-        return [
-            'total_users' => $totalUsers,
-            'premium_users' => $premiumUsers,
-            'premium_percentage' => $totalUsers > 0 ? round(($premiumUsers / $totalUsers) * 100, 1) : 0,
-            'verified_emails' => $verifiedEmails,
-            'verified_percentage' => $totalUsers > 0 ? round(($verifiedEmails / $totalUsers) * 100, 1) : 0,
-            'recent_users' => $recentUsers,
-        ];
+        return $kpis;
     }
 
     public function find(User $user): ?User
