@@ -2,18 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Anime;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-
     public function paginate(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = User::query()
@@ -33,14 +29,15 @@ class UserService
             ->appends($filters);
     }
 
-
     public function kpis(): array
     {
         return Cache::remember('user_kpis', now()->addMinutes(5), function () {
+            $now = now();
+
             $total = DB::table('users')->count();
             $premium = DB::table('users')->where('isPremium', true)->count();
             $verified = DB::table('users')->whereNotNull('email_verified_at')->count();
-            $recent = DB::table('users')->where('created_at', '>=', now()->subDays(30))->count();
+            $recent = DB::table('users')->where('created_at', '>=', $now->copy()->subDays(30))->count();
 
             return [
                 'total_users' => $total,
@@ -49,6 +46,7 @@ class UserService
                 'verified_emails' => $verified,
                 'verified_percentage' => $total > 0 ? round(($verified / $total) * 100, 1) : 0,
                 'recent_users' => $recent,
+                'updated_at' => $now->toDateTimeString(),
             ];
         });
     }
@@ -69,13 +67,43 @@ class UserService
         if ($user->email === trim($newEmail)) {
             return true;
         }
+
         $user->email = $newEmail;
         $user->email_verified_at = null;
-        return $user->save();
+        $saved = $user->save();
+
+        if ($saved) {
+            $this->clearKpiCache();
+        }
+
+        return $saved;
+    }
+
+    public function togglePremium(User $user, $request): bool
+    {
+        $user->isPremium = filter_var($request->input('isPremium'), FILTER_VALIDATE_BOOLEAN);
+        $saved = $user->save();
+
+        if ($saved) {
+            $this->clearKpiCache();
+        }
+
+        return $saved;
     }
 
     public function delete(User $user): bool
     {
-        return $user->delete();
+        $deleted = $user->delete();
+
+        if ($deleted) {
+            $this->clearKpiCache();
+        }
+
+        return $deleted;
+    }
+
+    private function clearKpiCache(): void
+    {
+        Cache::forget('user_kpis');
     }
 }

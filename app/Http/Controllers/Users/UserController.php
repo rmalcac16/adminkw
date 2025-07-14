@@ -85,9 +85,7 @@ class UserController extends Controller
 
     public function togglePremium(Request $request, User $user)
     {
-        $user->isPremium = filter_var($request->input('isPremium'), FILTER_VALIDATE_BOOLEAN);
-        $user->save();
-
+        $this->userService->togglePremium($user, $request);
         return back()->with('success', 'Estado premium actualizado.');
     }
 }
