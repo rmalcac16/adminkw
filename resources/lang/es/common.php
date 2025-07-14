@@ -23,6 +23,7 @@ return [
     'servers' => "Servidores",
     'episodes' => "Episodios",
     'players' => "Reproductores",
+    'users' => "Usuarios",
     'cache' => [
         'cleared' => "Caché de {type} limpiada correctamente.",
         'clear_failed' => "Error al limpiar la caché de {type}.",
@@ -37,4 +38,16 @@ return [
     'settings' => "Configuraciones",
     'profile' => "Perfil",
     'logout' => "Cerrar sesión",
+
+
+
+    'actions' => [
+        'cancel' => "Cancelar",
+        'saving' => "Guardando...",
+        'save_changes' => "Guardar cambios",
+        'confirm' => "Confirmar",
+        'delete' => "Eliminar",
+        'deleting' => "Eliminando...",
+    ]
+
 ];

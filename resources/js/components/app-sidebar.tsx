@@ -32,6 +32,12 @@ export function AppSidebar() {
             href: route().has('servers.index') ? route('servers.index') : '#',
             icon: Server,
         },
+
+        {
+            title: __('common.users'),
+            href: route().has('users.index') ? route('users.index') : '#',
+            icon: File,
+        },
     ];
 
     const footerNavItems: NavItem[] = [];
