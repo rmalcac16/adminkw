@@ -36,7 +36,7 @@ class EpisodeController extends Controller
     {
         $validatedData = $request->validated();
         $createdEpisode = $this->episodeService->create($anime, $validatedData);
-        return back()->with('success', __('episodes.store.success', ['number' => $createdEpisode->number]));
+        return back()->with('success', __('episodes.messages.created', ['number' => $createdEpisode->number]));
     }
 
 
@@ -44,12 +44,12 @@ class EpisodeController extends Controller
     {
         $validatedData = $request->validated();
         $updatedEpisode = $this->episodeService->update($anime, $episode, $validatedData);
-        return back()->with('success', __('episodes.update.success', ['number' => $updatedEpisode->number]));
+        return back()->with('success', __('episodes.messages.updated', ['number' => $updatedEpisode->number]));
     }
 
     public function destroy(Anime $anime, Episode $episode)
     {
         $this->episodeService->delete($anime, $episode);
-        return back()->with('success', __('episodes.destroy.success', ['number' => $episode->number]));
+        return back()->with('success', __('episodes.messages.deleted', ['number' => $episode->number]));
     }
 }

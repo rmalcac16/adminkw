@@ -9,43 +9,42 @@ use Illuminate\Support\Collection;
 
 class AnimeService
 {
-
-    public static function getAll(): Collection
+    public function getAll(): Collection
     {
-        return Anime::orderBy('id', 'desc')->get();
+        return Anime::select(['id', 'name', 'name_alternative',  'slug', 'status', 'aired'])
+            ->orderByDesc('id')
+            ->get();
     }
 
     public function paginate(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = Anime::query();
+        $query = Anime::query()->select(['id', 'name', 'name_alternative', 'slug', 'status', 'aired']);
 
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where('name', 'like', "%{$search}%");
+            $search = trim($filters['search']);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('name_alternative', 'like', "%{$search}%");
+            });
         }
 
-        return $query->orderBy('id', 'desc')->paginate($perPage)->appends($filters);
+        return $query->orderByDesc('id')->paginate($perPage)->appends($filters);
     }
 
 
     public function find(Anime $anime): ?Anime
     {
-
         $anime->rating = $anime->rating ? $this->getRatingKey($anime->rating) : null;
         return $anime;
     }
 
     public function create(array $data): Anime
     {
-        $originalName = $data['name'] ?? '';
-
+        $originalName = trim($data['name'] ?? '');
         $data['name'] = $this->generateUniqueName($originalName);
 
-        if (empty($data['slug'])) {
-            $data['slug'] = $this->generateUniqueSlug($data['name']);
-        } else {
-            $data['slug'] = $this->generateUniqueSlug($data['slug']);
-        }
+        $slugBase = $data['slug'] ?? $data['name'];
+        $data['slug'] = $this->generateUniqueSlug($slugBase);
 
         if (!empty($data['rating'])) {
             $data['rating'] = $this->translateRating($data['rating']);
@@ -56,7 +55,7 @@ class AnimeService
 
     public function update(Anime $anime, array $data): Anime
     {
-        if (isset($data['name']) && $data['name'] !== $anime->name) {
+        if (isset($data['name']) && trim($data['name']) !== $anime->name) {
             $data['name'] = $this->generateUniqueName($data['name'], $anime->id);
             $data['slug'] = $this->generateUniqueSlug($data['name'], $anime->id);
         }
@@ -81,18 +80,18 @@ class AnimeService
         return $anime->delete();
     }
 
-    protected function generateUniqueSlug(string $name, ?int $excludeId = null): string
+    protected function generateUniqueSlug(string $slugBase, ?int $excludeId = null): string
     {
-        $slug = Str::slug($name, '-');
-        $originalSlug = $slug;
+        $slug = Str::slug($slugBase);
+        $original = $slug;
         $counter = 2;
 
         while (
             Anime::where('slug', $slug)
-            ->when($excludeId, fn($query) => $query->where('id', '!=', $excludeId))
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
             ->exists()
         ) {
-            $slug = $originalSlug . '-' . $counter++;
+            $slug = $original . '-' . $counter++;
         }
 
         return $slug;
@@ -100,20 +99,19 @@ class AnimeService
 
     protected function generateUniqueName(string $name, ?int $excludeId = null): string
     {
-        $originalName = $name;
+        $original = $name;
         $counter = 2;
 
         while (
             Anime::where('name', $name)
-            ->when($excludeId, fn($query) => $query->where('id', '!=', $excludeId))
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
             ->exists()
         ) {
-            $name = $originalName . ' ' . $counter++;
+            $name = $original . ' ' . $counter++;
         }
 
         return $name;
     }
-
 
     protected function translateRating(string $key): ?string
     {
@@ -123,6 +121,6 @@ class AnimeService
     protected function getRatingKey(string $label): ?string
     {
         $ratings = __('animes.ratings');
-        return array_search($label, $ratings, true);
+        return array_search($label, $ratings, true) ?: null;
     }
 }

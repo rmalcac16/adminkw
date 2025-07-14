@@ -2,6 +2,11 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Breadcrumbs
+    |--------------------------------------------------------------------------
+    */
     'breadcrumb' => [
         'animes' => 'Animes',
         'index' => 'Episodios',
@@ -10,87 +15,104 @@ return [
         'episode_number' => 'Episodio {number}',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Page Titles & Descriptions
+    |--------------------------------------------------------------------------
+    */
     'index_page' => [
-        'title' => 'Episodios',
-        'description' => 'Lista de episodios disponibles para el anime {anime}.',
+        'title' => 'Lista de Episodios',
+        'description' => 'Visualiza y gestiona los episodios del anime {anime}.',
     ],
 
-    'create' => [
+    'create_page' => [
         'title' => 'Crear Episodio',
-        'description' => 'Formulario para crear un nuevo episodio.',
-        'button' => 'Crear Episodio',
-        'success' => 'Episodio "{number}" creado exitosamente.',
+        'description' => 'Agrega un nuevo episodio al anime seleccionado.',
     ],
 
-    'edit' => [
+    'edit_page' => [
         'title' => 'Editar Episodio',
-        'description' => 'Formulario para editar el episodio seleccionado.',
-        'button' => 'Actualizar Episodio',
-        'success' => 'Episodio "{number}" actualizado exitosamente.',
+        'description' => 'Modifica los detalles del episodio {number}.',
     ],
 
-    'delete' => [
-        'title' => 'Eliminar Episodio',
-        'description' => '¿Está seguro de que desea eliminar el episodio "{number}"? Esta acción no se puede deshacer.',
-        'success' => 'Episodio "{number}" eliminado exitosamente.',
+    'show_page' => [
+        'title' => 'Detalles del Episodio',
+        'description' => 'Información detallada del episodio {number}.',
     ],
 
-    'store' => [
-        'success' => 'El episodio ":number" ha sido creado exitosamente.',
-        'error' => 'Error al crear el episodio ":number". Por favor, inténtelo de nuevo.',
-    ],
-
-    'update' => [
-        'success' => 'El episodio ":number" ha sido actualizado exitosamente.',
-        'error' => 'Error al actualizar el episodio ":number". Por favor, inténtelo de nuevo.',
-    ],
-
-    'destroy' => [
-        'success' => 'El episodio ":number" ha sido eliminado exitosamente.',
-        'error' => 'Error al eliminar el episodio ":number". Por favor, inténtelo de nuevo.',
-    ],
-
-    'form' => [
-        'number' => 'Número del Episodio',
-        'number_placeholder' => 'Ingrese el número del episodio',
-    ],
-
-    'table' => [
+    /*
+    |--------------------------------------------------------------------------
+    | Labels
+    |--------------------------------------------------------------------------
+    */
+    'labels' => [
         'id' => 'ID',
+        'anime' => 'Anime',
+        'episode' => 'Episodio',
         'number' => 'Número',
         'views' => 'Vistas',
-        'views_app' => 'Vistas (App)',
-        'episode' => 'Episodio',
-        'created_at' => 'Creado',
-        'updated_at' => 'Actualizado',
+        'views_app' => 'Vistas en la App',
+        'created_at' => 'Creado el',
+        'updated_at' => 'Actualizado el',
         'actions' => 'Acciones',
     ],
 
-    'validation' => [
-        'number' => [
-            'required' => 'El número del episodio es obligatorio.',
-            'integer' => 'El número del episodio debe ser un número entero.',
-            'min' => 'El número del episodio debe ser al menos :min.',
-            'unique' => 'Ya existe un episodio con este número en el anime.',
-        ],
-        'update' => [
-            'failed' => 'Error al actualizar el episodio. Por favor, inténtelo de nuevo.',
-        ],
+    /*
+    |--------------------------------------------------------------------------
+    | Placeholders
+    |--------------------------------------------------------------------------
+    */
+    'placeholders' => [
+        'number' => 'Ingrese el número del episodio',
     ],
 
-    'animes' => [
-        'breadcrumb' => [
-            'index' => 'Animes',
-            'show' => 'Ver Anime',
-        ],
-        'index_page' => [
-            'title' => 'Animes',
-            'description' => 'Lista de animes disponibles en la plataforma.',
-        ],
-        'show' => [
-            'title' => 'Detalles del Anime',
-            'description' => 'Información detallada del anime seleccionado.',
-        ],
+    /*
+    |--------------------------------------------------------------------------
+    | Actions & Buttons
+    |--------------------------------------------------------------------------
+    */
+    'actions' => [
+        'create' => 'Crear Episodio',
+        'create_description' => 'Agrega un nuevo episodio al anime.',
+        'edit' => 'Editar Episodio',
+        'edit_description' => 'Modifica la información del episodio {number}.',
+        'delete' => 'Eliminar Episodio',
+        'delete_description' => '¿Eliminar el episodio {number}? Esta acción no se puede deshacer.',
+        'view' => 'Ver Episodio',
+    ],
+
+    'buttons' => [
+        'add' => 'Agregar Episodio',
+        'edit' => 'Editar',
+        'delete' => 'Eliminar',
+        'view' => 'Ver',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Flash Messages
+    |--------------------------------------------------------------------------
+    */
+    'messages' => [
+        'created' => 'Se ha creado el episodio :number exitosamente.',
+        'updated' => 'Se ha actualizado el episodio :number exitosamente.',
+        'deleted' => 'Se ha eliminado el episodio :number exitosamente.',
+        'not_found' => 'Episodio no encontrado.',
+        'anime_not_found' => 'Anime no encontrado.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Messages
+    |--------------------------------------------------------------------------
+    */
+    'validation' => [
+        'number_required' => 'El número del episodio es obligatorio.',
+        'number_unique' => 'El número del episodio ya existe para este anime.',
+        'number_numeric' => 'El número del episodio debe ser un valor numérico.',
+        'anime_required' => 'El anime es obligatorio.',
+        'anime_exists' => 'El anime seleccionado no existe.',
+        'anime_not_found' => 'Anime no encontrado.',
     ],
 
 ];

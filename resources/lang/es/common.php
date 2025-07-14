@@ -43,11 +43,18 @@ return [
 
     'actions' => [
         'cancel' => "Cancelar",
-        'saving' => "Guardando...",
+        'update' => "Actualizar",
+        'create' => "Crear",
         'save_changes' => "Guardar cambios",
         'confirm' => "Confirmar",
         'delete' => "Eliminar",
+    ],
+
+    'loaders' => [
+        'updating' => "Actualizando...",
+        'creating' => "Creando...",
         'deleting' => "Eliminando...",
-    ]
+        'saving' => "Guardando...",
+    ],
 
 ];

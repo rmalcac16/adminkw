@@ -36,6 +36,7 @@ return [
         'recent_users' => 'Nuevos ({days} días)',
         'recent_users_description' => 'Registros recientes',
         'of_total' => 'del total',
+        'last_updated' => 'Última actualización',
     ],
 
     'password_change' => [

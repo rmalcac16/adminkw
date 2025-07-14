@@ -23,7 +23,6 @@ class UpdateEpisodeRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
-                'max:10000',
                 Rule::unique('episodes', 'number')
                     ->where('anime_id', $anime->id)
                     ->ignore($episode->id),
@@ -31,14 +30,14 @@ class UpdateEpisodeRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator): void
+
+    public function messages(): array
     {
-        $firstError = collect($validator->errors()->messages())->flatten()->first();
-        throw new HttpResponseException(
-            redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('error', $firstError)
-        );
+        return [
+            'number.required' => __('episodes.validation.number_required'),
+            'number.integer' => __('episodes.validation.number_integer'),
+            'number.min' => __('episodes.validation.number_min', ['min' => 1]),
+            'number.unique' => __('episodes.validation.number_unique'),
+        ];
     }
 }

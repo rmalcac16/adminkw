@@ -3,25 +3,23 @@ import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
 import { formatDate } from '@/utils/dates';
 import { ColumnDef } from '@tanstack/react-table';
-import { MonitorSmartphoneIcon, Tv2Icon } from 'lucide-react';
-import { EpisodeDialogDelete } from './episode-dialog-delete';
-import { EpisodeDialogForm } from './episode-dialog-form';
+import { Film, Tv2Icon } from 'lucide-react';
 
 export function getEpisodeColumns(__: (key: string) => string, anime: AnimeData): ColumnDef<EpisodeData>[] {
     return [
         {
             accessorKey: 'id',
-            header: __('episodes.table.id'),
+            header: __('episodes.labels.id'),
             cell: ({ getValue }) => <span className="font-medium">{getValue<number>()}</span>,
         },
         {
             accessorKey: 'number',
-            header: __('episodes.table.number'),
+            header: __('episodes.labels.number'),
             cell: ({ row }) => {
                 const isLatest = row.index === 0;
                 return (
                     <span className="font-semibold">
-                        {__('episodes.table.episode')} {row.original.number}
+                        {__('episodes.labels.episode')} {row.original.number}
                         {isLatest && (
                             <Badge className="ml-2" variant="outline">
                                 {__('common.latest')}
@@ -33,7 +31,7 @@ export function getEpisodeColumns(__: (key: string) => string, anime: AnimeData)
         },
         {
             accessorKey: 'views',
-            header: __('episodes.table.views'),
+            header: __('episodes.labels.views'),
             cell: ({ getValue }) => (
                 <Badge variant="secondary">
                     <Tv2Icon />
@@ -43,17 +41,17 @@ export function getEpisodeColumns(__: (key: string) => string, anime: AnimeData)
         },
         {
             accessorKey: 'views_app',
-            header: __('episodes.table.views_app'),
+            header: __('episodes.labels.views_app'),
             cell: ({ getValue }) => (
                 <Badge>
-                    <MonitorSmartphoneIcon />
+                    <Film />
                     <span>{getValue<number>()}</span>
                 </Badge>
             ),
         },
         {
             accessorKey: 'created_at',
-            header: __('episodes.table.created_at'),
+            header: __('episodes.labels.created_at'),
             cell: ({ getValue }) => {
                 const date = getValue<string>();
                 return <span className="text-sm text-muted-foreground">{formatDate(date)}</span>;
@@ -61,13 +59,7 @@ export function getEpisodeColumns(__: (key: string) => string, anime: AnimeData)
         },
         {
             id: 'actions',
-            header: __('episodes.table.actions'),
-            cell: ({ row }) => (
-                <div className="flex items-center gap-2">
-                    <EpisodeDialogForm anime={anime} episode={row.original} triggerType="icon" />
-                    <EpisodeDialogDelete episode={row.original} />
-                </div>
-            ),
+            header: __('episodes.labels.actions'),
         },
     ];
 }

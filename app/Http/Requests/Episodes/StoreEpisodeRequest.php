@@ -22,10 +22,10 @@ class StoreEpisodeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'number.required' => __('episodes.validation.number.required'),
-            'number.integer' => __('episodes.validation.number.integer'),
-            'number.min' => __('episodes.validation.number.min', ['min' => 1]),
-            'number.unique' => __('episodes.validation.number.unique'),
+            'number.required' => __('episodes.validation.number_required'),
+            'number.integer' => __('episodes.validation.number_integer'),
+            'number.min' => __('episodes.validation.number_min', ['min' => 1]),
+            'number.unique' => __('episodes.validation.number_unique'),
         ];
     }
 }

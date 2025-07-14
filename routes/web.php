@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Animes\AnimeController;
 use App\Http\Controllers\CacheController;
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Episodes\EpisodeController;
 use App\Http\Controllers\Genres\GenreController;
 use App\Http\Controllers\Players\PlayerController;
@@ -16,9 +17,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
     Route::resource('genres', GenreController::class)->only(['index', 'store', 'update', 'destroy'])->names('genres');
     Route::resource('animes', AnimeController::class);
     Route::resource('servers', ServerController::class)->names('servers')->only(['index', 'store', 'update', 'destroy']);
@@ -39,9 +40,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('cache.episodes.clear');
     Route::post('/cache/animes/{anime}/episodes/{episode}/players/clear', [CacheController::class, 'clearPlayerCache'])->name('cache.players.clear');
 });
-
-
-
 
 
 

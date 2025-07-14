@@ -1,15 +1,16 @@
-import { DataTable } from '@/components/data-table';
-import PaginationWrapper from '@/components/pagination-wrapper';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useLang } from '@/hooks/useLang';
-import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
 import * as React from 'react';
 import { toast } from 'sonner';
 
+import { DataTable } from '@/components/data-table';
+import PaginationWrapper from '@/components/pagination-wrapper';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Crown, MailCheck } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useLang } from '@/hooks/useLang';
+import AppLayout from '@/layouts/app-layout';
+
+import { KeyRound, MailCheck } from 'lucide-react';
 import DialogChangeEmail from './partials/DialogChangeEmail';
 import DialogChangePassword from './partials/DialogChangePassword';
 import DeleteUserDialog from './partials/DialogDeleteUser';
@@ -21,18 +22,24 @@ export default function Index({ users, filters, kpis }: any) {
     const { props } = usePage();
     const flash = props.flash as { success?: string; error?: string };
 
-    const [emailModalOpen, setEmailModalOpen] = React.useState(false);
-    const [passwordModalOpen, setPasswordModalOpen] = React.useState(false);
-    const [userToEditEmail, setUserToEditEmail] = React.useState(null);
-    const [userToEditPassword, setUserToEditPassword] = React.useState(null);
+    const [modals, setModals] = React.useState({
+        email: { open: false, user: null },
+        password: { open: false, user: null },
+    });
 
     const [search, setSearch] = React.useState(filters?.search ?? '');
     const lastSearchRef = React.useRef(search);
 
-    const columns = React.useMemo(() => getUserColumns(__), [__]);
+    const openModal = (type: 'email' | 'password', user: any) => {
+        setModals((prev) => ({
+            ...prev,
+            [type]: { open: true, user },
+        }));
+    };
 
-    const columnsWithActions = React.useMemo(() => {
-        return columns.map((col) =>
+    const columns = React.useMemo(() => {
+        const baseColumns = getUserColumns(__);
+        return baseColumns.map((col) =>
             col.id === 'actions'
                 ? {
                       ...col,
@@ -40,11 +47,11 @@ export default function Index({ users, filters, kpis }: any) {
                           const user = row.original;
                           return (
                               <div className="flex gap-2">
-                                  <Button variant="outline" size="icon" className="size-8" onClick={() => openEmailModal(user)}>
+                                  <Button variant="outline" size="icon" className="size-8" onClick={() => openModal('email', user)}>
                                       <MailCheck />
                                   </Button>
-                                  <Button variant="outline" size="icon" className="size-8" onClick={() => openPasswordModal(user)}>
-                                      <Crown />
+                                  <Button variant="outline" size="icon" className="size-8" onClick={() => openModal('password', user)}>
+                                      <KeyRound />
                                   </Button>
                                   <DeleteUserDialog user={user} />
                               </div>
@@ -53,17 +60,7 @@ export default function Index({ users, filters, kpis }: any) {
                   }
                 : col,
         );
-    }, [columns, __]);
-
-    const openEmailModal = (user: any) => {
-        setUserToEditEmail(user);
-        setEmailModalOpen(true);
-    };
-
-    const openPasswordModal = (user: any) => {
-        setUserToEditPassword(user);
-        setPasswordModalOpen(true);
-    };
+    }, [__]);
 
     React.useEffect(() => {
         if (flash.success) toast.success(flash.success);
@@ -78,67 +75,54 @@ export default function Index({ users, filters, kpis }: any) {
     React.useEffect(() => {
         if (search === lastSearchRef.current) return;
 
-        const delayDebounce = setTimeout(() => {
-            router.get(
-                route('users.index'),
-                { search },
-                {
-                    preserveState: true,
-                    replace: true,
-                },
-            );
-
+        const delay = setTimeout(() => {
+            router.get(route('users.index'), { search }, { preserveState: true, replace: true });
             lastSearchRef.current = search;
-        }, 500);
+        }, 300);
 
-        return () => clearTimeout(delayDebounce);
+        return () => clearTimeout(delay);
     }, [search]);
 
-    const breadcrumbs = [
-        {
-            title: __('users.breadcrumb.index'),
-            href: route('users.index'),
-        },
-    ];
+    const breadcrumbs = [{ title: __('users.breadcrumb.index'), href: route('users.index') }];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={__('users.index_page.title')} />
-
             <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-semibold">{__('users.index_page.title')}</h1>
-                        <p className="text-sm text-muted-foreground">{__('users.index_page.description')}</p>
-                    </div>
+                <div>
+                    <h1 className="text-2xl font-semibold">{__('users.index_page.title')}</h1>
+                    <p className="text-sm text-muted-foreground">{__('users.index_page.description')}</p>
                 </div>
 
                 <UserKpis kpis={kpis} />
 
                 <Card>
                     <CardContent className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Input
-                                name="user_table_search"
-                                type="search"
-                                autoComplete="search-users"
-                                spellCheck="false"
-                                className="max-w-sm"
-                                placeholder={__('tables.search_placeholder', { field: __('tables.name') })}
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                        </div>
-
-                        <DataTable columns={columnsWithActions} data={users.data} enableClientPagination={false} enableClientFiltering={false} />
-
+                        <Input
+                            key="search"
+                            type="search"
+                            className="max-w-sm"
+                            autoComplete="off"
+                            placeholder={__('tables.search_placeholder', { field: __('tables.name') })}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        <DataTable columns={columns} data={users.data} enableClientPagination={false} enableClientFiltering={false} />
                         <PaginationWrapper links={users.links} />
                     </CardContent>
                 </Card>
             </div>
 
-            <DialogChangeEmail open={emailModalOpen} setOpen={setEmailModalOpen} user={userToEditEmail} />
-            <DialogChangePassword open={passwordModalOpen} setOpen={setPasswordModalOpen} user={userToEditPassword} />
+            <DialogChangeEmail
+                open={modals.email.open}
+                setOpen={(open) => setModals((prev) => ({ ...prev, email: { ...prev.email, open } }))}
+                user={modals.email.user}
+            />
+            <DialogChangePassword
+                open={modals.password.open}
+                setOpen={(open) => setModals((prev) => ({ ...prev, password: { ...prev.password, open } }))}
+                user={modals.password.user}
+            />
         </AppLayout>
     );
 }

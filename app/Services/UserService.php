@@ -42,14 +42,15 @@ class UserService
             return [
                 'total_users' => $total,
                 'premium_users' => $premium,
-                'premium_percentage' => $total > 0 ? round(($premium / $total) * 100, 1) : 0,
+                'premium_percentage' => $total > 0 ? number_format(($premium / $total) * 100, 2) : 0,
                 'verified_emails' => $verified,
-                'verified_percentage' => $total > 0 ? round(($verified / $total) * 100, 1) : 0,
+                'verified_percentage' => $total > 0 ? number_format(($verified / $total) * 100, 2) : 0,
                 'recent_users' => $recent,
                 'updated_at' => $now->toDateTimeString(),
             ];
         });
     }
+
 
     public function find(User $user): ?User
     {

@@ -64,7 +64,6 @@ export function getUserColumns(__: (key: string) => string): ColumnDef<UserData>
         {
             id: 'actions',
             header: __('users.table.actions'),
-            cell: () => null,
         },
     ];
 }
