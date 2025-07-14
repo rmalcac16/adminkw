@@ -36,16 +36,21 @@ class UserService
 
     public function kpis(): array
     {
-        $kpis = Cache::remember('user_kpis', now()->addMinutes(5), function () {
+        return Cache::remember('user_kpis', now()->addMinutes(5), function () {
+            $total = DB::table('users')->count();
+            $premium = DB::table('users')->where('isPremium', true)->count();
+            $verified = DB::table('users')->whereNotNull('email_verified_at')->count();
+            $recent = DB::table('users')->where('created_at', '>=', now()->subDays(30))->count();
+
             return [
-                'total' => DB::table('users')->count(),
-                'premium' => DB::table('users')->where('isPremium', true)->count(),
-                'verified' => DB::table('users')->whereNotNull('email_verified_at')->count(),
-                'recent' => DB::table('users')->where('created_at', '>=', now()->subDays(30))->count(),
+                'total_users' => $total,
+                'premium_users' => $premium,
+                'premium_percentage' => $total > 0 ? round(($premium / $total) * 100, 1) : 0,
+                'verified_emails' => $verified,
+                'verified_percentage' => $total > 0 ? round(($verified / $total) * 100, 1) : 0,
+                'recent_users' => $recent,
             ];
         });
-
-        return $kpis;
     }
 
     public function find(User $user): ?User
