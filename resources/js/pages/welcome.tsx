@@ -20,7 +20,6 @@ export default function Welcome() {
 
             <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
                 <div className="grid w-full max-w-6xl grid-cols-1 gap-10 md:grid-cols-2">
-                    {/* Texto principal */}
                     <div className="flex flex-col justify-center space-y-6">
                         <Badge variant="secondary" className="w-fit text-sm">
                             {__('welcome.badge')}
@@ -33,7 +32,7 @@ export default function Welcome() {
                         <div className="flex flex-col gap-4 pt-2 sm:flex-row">
                             {auth.user ? (
                                 <Button size="lg" asChild>
-                                    <Link href={route('dashboard')}>{__('welcome.dashboard')}</Link>
+                                    <Link href={route('dashboard.index')}>{__('welcome.dashboard')}</Link>
                                 </Button>
                             ) : (
                                 <>

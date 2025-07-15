@@ -57,4 +57,30 @@ return [
         'saving' => "Guardando...",
     ],
 
+    'tables' => [
+        'actions' => "Acciones",
+        'edit' => "Editar",
+        'delete' => "Eliminar",
+        'view' => "Ver",
+        'no_data' => "No hay datos disponibles.",
+    ],
+
+    'labels' => [
+        'search' => "Buscar",
+    ],
+
+    'placeholders' => [
+        'search' => 'Buscar por {field}...',
+        'search_multiple' => 'Buscar por {fields}...',
+    ],
+
+    'fields' => [
+        'title' => 'título',
+        'slug' => 'slug',
+        'name_mal' => 'nombre en MyAnimeList',
+        'email' => 'correo electrónico',
+        'name' => 'nombre',
+        'embed' => 'dominio'
+    ],
+
 ];

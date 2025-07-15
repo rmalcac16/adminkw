@@ -99,13 +99,12 @@ export default function Index({ users, filters, kpis }: any) {
                 <Card>
                     <CardContent className="space-y-4">
                         <Input
-                            key="search"
-                            type="search"
-                            className="max-w-sm"
-                            autoComplete="off"
-                            placeholder={__('tables.search_placeholder', { field: __('tables.name') })}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            placeholder={__('common.placeholders.search_multiple', {
+                                fields: ['name', 'email'].map((field) => __('users.fields.' + field)).join(', '),
+                            })}
+                            className="max-w-sm"
                         />
                         <DataTable columns={columns} data={users.data} enableClientPagination={false} enableClientFiltering={false} />
                         <PaginationWrapper links={users.links} />

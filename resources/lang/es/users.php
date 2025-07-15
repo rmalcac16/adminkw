@@ -13,8 +13,6 @@ return [
         'description' => 'Administra todos los usuarios',
     ],
 
-
-
     'table' => [
         'id' => 'ID',
         'name' => 'Nombre',
@@ -25,6 +23,12 @@ return [
         'actions' => 'Acciones',
         'created_at' => 'Creado',
         'updated_at' => 'Actualizado',
+    ],
+
+
+    'fields' => [
+        'name' => 'nombre',
+        'email' => 'correo electrónico'
     ],
 
     'kpis' => [

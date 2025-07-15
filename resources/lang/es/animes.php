@@ -168,4 +168,10 @@ return [
         'not_found_id' => 'No se encontró el anime con ese ID.',
     ],
 
+
+    'fields' => [
+        'name' => 'nombre',
+        'name_alternative' => 'nombres alternativos',
+    ]
+
 ];

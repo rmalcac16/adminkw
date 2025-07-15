@@ -67,14 +67,26 @@ export function DataTable<TData, TValue>({
         },
     });
 
+    const placeholder = React.useMemo(() => {
+        if (!filterFields.length) return __('common.placeholders.search', { field: '...' });
+
+        if (filterFields.length === 1) {
+            return __('common.placeholders.search', {
+                field: __('common.fields.' + filterFields[0]),
+            });
+        }
+
+        return __('common.placeholders.search_multiple', {
+            fields: filterFields.map((field) => __('common.fields.' + field)).join(', '),
+        });
+    }, [filterFields, __]);
+
     return (
         <div className="space-y-4">
             {enableClientFiltering && (
                 <div className="flex items-center">
                     <Input
-                        placeholder={__('tables.search_placeholder', {
-                            field: __('tables.name'),
-                        })}
+                        placeholder={placeholder}
                         value={globalFilter}
                         onChange={(event) => setGlobalFilter(event.target.value)}
                         className="max-w-sm"
@@ -124,7 +136,7 @@ export function DataTable<TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {__('tables.no_data')}
+                                    {__('common.tables.no_data')}
                                 </TableCell>
                             </TableRow>
                         )}

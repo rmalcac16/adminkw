@@ -38,7 +38,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
 
-        syncLangFiles(['common', 'pagination', 'tables']);
+        syncLangFiles(['common', 'pagination', 'auth']);
 
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 

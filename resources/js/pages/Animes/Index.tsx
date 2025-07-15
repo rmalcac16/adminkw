@@ -70,7 +70,9 @@ export default function Index({ animes, filters }: any) {
                             <Input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder={__('tables.search_placeholder', { field: __('tables.name') })}
+                                placeholder={__('common.placeholders.search_multiple', {
+                                    fields: ['name', 'name_alternative'].map((field) => __('animes.fields.' + field)).join(', '),
+                                })}
                                 className="max-w-sm"
                             />
                         </div>
