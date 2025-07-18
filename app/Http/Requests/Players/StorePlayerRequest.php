@@ -24,6 +24,7 @@ class StorePlayerRequest extends FormRequest
 
                 $this->merge([
                     'code' => $cleaned,
+                    'code_backup' => $original,
                 ]);
             }
         }
@@ -36,15 +37,24 @@ class StorePlayerRequest extends FormRequest
             if ($domain === '') continue;
 
             $escapedDomain = preg_quote($domain, '~');
-            $pattern = "~(?:https?://)?(?:www\.)?{$escapedDomain}/(?:[a-z]/)?([^/?&]+)~i";
+            $pattern = "~(?:https?://)?(?:www\.)?{$escapedDomain}/(?:[a-z]/)?([^/?&#\.]+)~i";
 
             if (preg_match($pattern, $url, $matches)) {
                 return $matches[1];
             }
         }
 
-        if (preg_match('~/([^/]+)$~', $url, $matches)) {
-            return $matches[1];
+        // Fallback: tratar de extraer el último segmento útil sin extensión
+        $path = parse_url($url, PHP_URL_PATH);
+        $segments = array_filter(explode('/', $path));
+
+        // Intentar el penúltimo si el último contiene extensión de archivo
+        if (!empty($segments)) {
+            $last = end($segments);
+            if (preg_match('/\.[a-zA-Z0-9]+$/', $last) && count($segments) > 1) {
+                $last = prev($segments);
+            }
+            return $last;
         }
 
         return $url;
@@ -57,23 +67,15 @@ class StorePlayerRequest extends FormRequest
                 'required',
                 'string',
                 'max:512',
-                Rule::unique('players')->where(function ($query) {
-                    return $query->where('episode_id', $this->episode_id)
-                        ->where('server_id', $this->server_id);
-                }),
+                Rule::unique('players')->where(
+                    fn($query) =>
+                    $query->where('server_id', $this->server_id)
+                ),
             ],
-            'server_id' => [
-                'required',
-                'exists:servers,id',
-            ],
-            'episode_id' => [
-                'required',
-                'exists:episodes,id',
-            ],
-            'languaje' => [
-                'required',
-                'integer',
-            ],
+            'code_backup' => ['nullable', 'string', 'max:1024'],
+            'server_id' => ['required', 'exists:servers,id'],
+            'episode_id' => ['required', 'exists:episodes,id'],
+            'languaje' => ['required', 'integer'],
         ];
     }
 

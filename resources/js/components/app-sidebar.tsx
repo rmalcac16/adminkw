@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { useLang } from '@/hooks/useLang';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { File, LayoutGrid, ListFilter, Server } from 'lucide-react';
+import { File, LayoutGrid, ListFilter, Server, User2 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -36,7 +36,7 @@ export function AppSidebar() {
         {
             title: __('common.users'),
             href: route().has('users.index') ? route('users.index') : '#',
-            icon: File,
+            icon: User2,
         },
     ];
 

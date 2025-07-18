@@ -24,6 +24,7 @@ class UpdatePlayerRequest extends FormRequest
 
                 $this->merge([
                     'code' => $cleaned,
+                    'code_backup' => $original,
                 ]);
             }
         }
@@ -36,15 +37,22 @@ class UpdatePlayerRequest extends FormRequest
             if ($domain === '') continue;
 
             $escapedDomain = preg_quote($domain, '~');
-            $pattern = "~(?:https?://)?(?:www\.)?{$escapedDomain}/(?:[a-z]/)?([^/?&]+)~i";
+            $pattern = "~(?:https?://)?(?:www\.)?{$escapedDomain}/(?:[a-z]/)?([^/?&#\.]+)~i";
 
             if (preg_match($pattern, $url, $matches)) {
                 return $matches[1];
             }
         }
 
-        if (preg_match('~/([^/]+)$~', $url, $matches)) {
-            return $matches[1];
+        $path = parse_url($url, PHP_URL_PATH);
+        $segments = array_filter(explode('/', $path));
+
+        if (!empty($segments)) {
+            $last = end($segments);
+            if (preg_match('/\.[a-zA-Z0-9]+$/', $last) && count($segments) > 1) {
+                $last = prev($segments);
+            }
+            return $last;
         }
 
         return $url;
@@ -58,24 +66,13 @@ class UpdatePlayerRequest extends FormRequest
                 'string',
                 'max:512',
                 Rule::unique('players')
-                    ->where(function ($query) {
-                        return $query->where('episode_id', $this->episode_id)
-                            ->where('server_id', $this->server_id);
-                    })
-                    ->ignore($this->route('player')),
+                    ->where(fn($query) => $query->where('server_id', $this->server_id))
+                    ->ignore($this->route('player')), // Ignorar el actual
             ],
-            'server_id' => [
-                'required',
-                'exists:servers,id',
-            ],
-            'episode_id' => [
-                'required',
-                'exists:episodes,id',
-            ],
-            'languaje' => [
-                'required',
-                'integer',
-            ],
+            'code_backup' => ['nullable', 'string', 'max:1024'],
+            'server_id' => ['required', 'exists:servers,id'],
+            'episode_id' => ['required', 'exists:episodes,id'],
+            'languaje' => ['required', 'integer'],
         ];
     }
 

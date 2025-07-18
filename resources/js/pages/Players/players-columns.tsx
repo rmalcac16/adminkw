@@ -48,8 +48,9 @@ export function getPlayerColumns(__: (key: string) => string, servers: ServerDat
             header: __('players.table.code'),
             cell: ({ row, getValue }) => {
                 const url = getValue<string>();
-                const serverEmbed = row.original.server?.embed ?? '—';
-                const urlCode = serverEmbed + 'e/' + url;
+                let serverEmbed = row.original.server?.embed ?? '—';
+                serverEmbed = serverEmbed.replace(/\/+$/, '');
+                const urlCode = serverEmbed + '/e/' + url;
 
                 const handleCopy = () => {
                     navigator.clipboard.writeText(urlCode);

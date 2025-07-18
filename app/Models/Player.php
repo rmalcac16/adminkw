@@ -14,6 +14,7 @@ class Player extends Model
         'languaje',
         'server_id',
         'episode_id',
+        'code_backup',
     ];
 
     public function server()
