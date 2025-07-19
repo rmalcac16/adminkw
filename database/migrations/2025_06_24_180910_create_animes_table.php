@@ -37,6 +37,7 @@ return new class extends Migration
             $table->boolean('isTopic')->default(false);
             $table->unsignedInteger('mal_id')->nullable();
             $table->unsignedInteger('tmdb_id')->nullable();
+            $table->string('short_name')->nullable()->unique()->index();
             $table->timestamps();
         });
     }

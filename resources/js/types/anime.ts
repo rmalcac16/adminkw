@@ -26,4 +26,5 @@ export interface AnimeData {
     tmdb_id: number | null;
     created_at: string;
     updated_at: string;
+    short_name: string | null;
 }

@@ -5,6 +5,7 @@ namespace App\Http\Requests\Players;
 use App\Models\Server;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use InvalidArgumentException;
 
 class StorePlayerRequest extends FormRequest
 {
@@ -20,7 +21,7 @@ class StorePlayerRequest extends FormRequest
 
             if ($server && is_array($server->domains)) {
                 $original = $this->input('code');
-                $cleaned = $this->extractIdFromDomains($original, $server->domains);
+                $cleaned = $this->extractId($original);
 
                 $this->merge([
                     'code' => $cleaned,
@@ -30,34 +31,22 @@ class StorePlayerRequest extends FormRequest
         }
     }
 
-    protected function extractIdFromDomains(string $url, array $domains): string
+    protected function extractId(string $url): string
     {
-        foreach ($domains as $domain) {
-            $domain = trim($domain);
-            if ($domain === '') continue;
-
-            $escapedDomain = preg_quote($domain, '~');
-            $pattern = "~(?:https?://)?(?:www\.)?{$escapedDomain}/(?:[a-z]/)?([^/?&#\.]+)~i";
-
-            if (preg_match($pattern, $url, $matches)) {
-                return $matches[1];
-            }
-        }
-
-        // Fallback: tratar de extraer el último segmento útil sin extensión
         $path = parse_url($url, PHP_URL_PATH);
-        $segments = array_filter(explode('/', $path));
+        $path = trim(preg_replace('/\s+/', '/', $path), '/');
 
-        // Intentar el penúltimo si el último contiene extensión de archivo
-        if (!empty($segments)) {
-            $last = end($segments);
-            if (preg_match('/\.[a-zA-Z0-9]+$/', $last) && count($segments) > 1) {
-                $last = prev($segments);
-            }
-            return $last;
+        $segments = array_values(array_filter(explode('/', $path)));
+
+        if (count($segments) === 1) {
+            return $segments[0];
         }
 
-        return $url;
+        if (count($segments) >= 2) {
+            return $segments[1];
+        }
+
+        throw new InvalidArgumentException('URL inválida: no se pudo extraer el ID.');
     }
 
     public function rules(): array

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
+import { ServerData } from '@/types/server';
 import { shortenText } from '@/utils/text';
 import { Edit2 } from 'lucide-react';
 import React from 'react';
@@ -16,20 +17,25 @@ import { toast } from 'sonner';
 import { getEpisodeColumns } from './episode-columns';
 import DialogDeleteEpisode from './partials/DialogDeleteEpisode';
 import { DialogFormEpisode } from './partials/DialogFormEpisode';
+import { DialogGenerateEpisodesPlayers } from './partials/DialogGenerateEpisodesPlayers';
 
-export default function Index({ anime, episodes }: { anime: AnimeData; episodes: EpisodeData[] }) {
+export default function Index({ anime, episodes, servers }: { anime: AnimeData; episodes: EpisodeData[]; servers: ServerData[] }) {
     const { __ } = useLang();
     const { props } = usePage();
     const flash = props.flash as { success?: string; error?: string };
 
     const [modals, setModals] = React.useState({
         create: false,
+        generatePlayers: false,
         edit: { open: false, episode: null as EpisodeData | null },
         delete: { open: false, episode: null as EpisodeData | null },
     });
 
     const openCreateModal = () => setModals((prev) => ({ ...prev, create: true }));
     const closeCreateModal = () => setModals((prev) => ({ ...prev, create: false }));
+
+    const openGenerateEpisodesPlayersModal = () => setModals((prev) => ({ ...prev, generatePlayers: true }));
+    const closeGenerateEpisodesPlayersModal = () => setModals((prev) => ({ ...prev, generatePlayers: false }));
 
     const openEditModal = (episode: EpisodeData) => setModals((prev) => ({ ...prev, edit: { open: true, episode } }));
     const closeEditModal = () => setModals((prev) => ({ ...prev, edit: { open: false, episode: null } }));
@@ -79,12 +85,15 @@ export default function Index({ anime, episodes }: { anime: AnimeData; episodes:
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={__('episodes.index_page.title')} />
             <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                     <div className="space-y-1">
                         <h1 className="text-2xl font-semibold">{__('episodes.index_page.title')}</h1>
                         <p className="text-sm text-muted-foreground">{__('episodes.index_page.description', { anime: anime.name })}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-end">
+                        <Button variant="outline" onClick={openGenerateEpisodesPlayersModal}>
+                            {__('episodes.buttons.generate')}
+                        </Button>
                         <Button onClick={openCreateModal}>{__('episodes.buttons.add')}</Button>
                         <ClearCacheButton routeName="cache.episodes.clear" labelKey="episodes" routeParams={{ anime: anime.id }} />
                     </div>
@@ -92,17 +101,7 @@ export default function Index({ anime, episodes }: { anime: AnimeData; episodes:
 
                 <Card>
                     <CardContent>
-                        <DataTable
-                            columns={columns}
-                            data={episodes}
-                            filterFields={['number']}
-                            getRowLink={(episode) =>
-                                route('players.index', {
-                                    anime: episode.anime_id,
-                                    episode: episode.id,
-                                })
-                            }
-                        />
+                        <DataTable columns={columns} data={episodes} filterFields={['number']} />
                     </CardContent>
                 </Card>
             </div>
@@ -119,6 +118,13 @@ export default function Index({ anime, episodes }: { anime: AnimeData; episodes:
                         edit: { ...prev.edit, open },
                     }))
                 }
+            />
+
+            <DialogGenerateEpisodesPlayers
+                anime={anime}
+                servers={servers}
+                open={modals.generatePlayers}
+                setOpen={closeGenerateEpisodesPlayersModal}
             />
         </AppLayout>
     );

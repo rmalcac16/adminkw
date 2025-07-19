@@ -38,6 +38,7 @@ class UpdateAnimeRequest extends FormRequest
             'isTopic' => 'nullable|boolean',
             'mal_id' => 'nullable|integer|min:0',
             'tmdb_id' => 'nullable|integer|min:0',
+            'short_name' => 'nullable|string|max:255|unique:animes,short_name,' . $this->route('anime'),
         ];
     }
 
@@ -82,6 +83,12 @@ class UpdateAnimeRequest extends FormRequest
             'isTopic.boolean' => 'El campo de "tema destacado" debe ser verdadero o falso.',
             'mal_id.integer' => 'El ID de MyAnimeList debe ser un número entero.',
             'tmdb_id.integer' => 'El ID de TMDB debe ser un número entero.',
+
+            'short_name.max' => __('episodes.validation.short_name.max'),
+            'short_name.unique' => __('episodes.validation.short_name.unique'),
+            'short_name.string' => __('episodes.validation.short_name.string'),
+            'short_name.required' => __('episodes.validation.short_name.required'),
+
         ];
     }
 }

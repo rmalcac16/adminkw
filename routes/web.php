@@ -24,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('animes', AnimeController::class);
     Route::resource('servers', ServerController::class)->names('servers')->only(['index', 'store', 'update', 'destroy']);
 
+    Route::post('animes/{anime}/episodes/generate-players', [EpisodeController::class, 'generatePlayers'])->name('episodes.generate-players');
     Route::resource('animes.episodes', EpisodeController::class)->names('episodes')->only(['index', 'store', 'update', 'destroy']);
     Route::resource('animes.episodes.players', PlayerController::class)->names('players')->only(['index', 'store', 'update', 'destroy']);
 

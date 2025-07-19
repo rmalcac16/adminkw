@@ -33,6 +33,7 @@ class Anime extends Model
         'isTopic',
         'mal_id',
         'tmdb_id',
+        'short_name',
     ];
 
     public function episodes(): HasMany

@@ -55,6 +55,11 @@ return [
         'created_at' => 'Creado el',
         'updated_at' => 'Actualizado el',
         'actions' => 'Acciones',
+        'server' => 'Servidor',
+        'links' => 'Enlaces',
+        'episode_initial' => 'Episodio Inicial',
+        'episode_final' => 'Episodio Final',
+        'language' => 'Idioma',
     ],
 
     /*
@@ -64,6 +69,10 @@ return [
     */
     'placeholders' => [
         'number' => 'Ingrese el número del episodio',
+        'links' => 'Ingrese los enlaces del episodio, separados por lineas',
+        'server' => 'Seleccione el servidor para el episodio',
+        'episode_initial' => 'Ingrese el número del primer episodio',
+        'episode_final' => 'Ingrese el número del último episodio',
     ],
 
     /*
@@ -79,6 +88,8 @@ return [
         'delete' => 'Eliminar Episodio',
         'delete_description' => '¿Eliminar el episodio {number}? Esta acción no se puede deshacer.',
         'view' => 'Ver Episodio',
+        'generate' => 'Generar episodios',
+        'generate_description' => 'Genera los episodios para el anime {anime}.',
     ],
 
     'buttons' => [
@@ -86,6 +97,7 @@ return [
         'edit' => 'Editar',
         'delete' => 'Eliminar',
         'view' => 'Ver',
+        'generate' => 'Generar',
     ],
 
     /*
@@ -99,6 +111,11 @@ return [
         'deleted' => 'Se ha eliminado el episodio :number exitosamente.',
         'not_found' => 'Episodio no encontrado.',
         'anime_not_found' => 'Anime no encontrado.',
+        'invalid_lines' => 'Líneas inválidas',
+        'invalid_links' => 'Enlaces inválidos',
+        'invalid_server' => 'Servidor inválido',
+        'no_servers_available' => 'No hay servidores disponibles',
+        'players_generated' => 'Los capitulos y reproductores se han generado exitosamente.',
     ],
 
     /*
@@ -113,6 +130,12 @@ return [
         'anime_required' => 'El anime es obligatorio.',
         'anime_exists' => 'El anime seleccionado no existe.',
         'anime_not_found' => 'Anime no encontrado.',
+    ],
+
+    'languages' => [
+        'sub' => 'Subtitulado',
+        'lat' => 'Latino',
+        'cas' => 'Castellano',
     ],
 
 ];

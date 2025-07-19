@@ -18,10 +18,11 @@ import { Trash2, TriangleAlert } from 'lucide-react';
 
 export function AnimeDialogDelete({ anime }: { anime: AnimeData }) {
     const { __ } = useLang();
-    const { delete: destroy, processing } = useForm();
+
+    const form = useForm({});
 
     const handleDelete = () => {
-        destroy(route('animes.destroy', anime.id), {
+        form.delete(route('animes.destroy', anime.id), {
             preserveScroll: true,
         });
     };
@@ -29,22 +30,24 @@ export function AnimeDialogDelete({ anime }: { anime: AnimeData }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon" className="size-8" disabled={processing}>
+                <Button variant="destructive" size="icon" className="size-8" disabled={form.processing}>
                     <Trash2 />
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{__('animes.delete.title', { name: anime.name || __('common.unknown') })}</AlertDialogTitle>
+                    <AlertDialogTitle>{__('animes.actions.delete')}</AlertDialogTitle>
                     <AlertDialogDescription className="flex flex-col items-center space-y-6">
-                        <TriangleAlert className="size-24 text-yellow-500" />
-                        {__('animes.delete.description', { name: anime.name || __('common.unknown') })}
+                        <TriangleAlert size={96} className="text-yellow-500" />
+                        {__('animes.actions.delete_description', {
+                            name: anime.name,
+                        })}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={processing}>{__('common.cancel')}</AlertDialogCancel>
-                    <Button type="button" onClick={handleDelete} disabled={processing} variant="destructive">
-                        {processing ? __('common.deleting') : __('common.delete')}
+                    <AlertDialogCancel disabled={form.processing}>{__('common.cancel')}</AlertDialogCancel>
+                    <Button type="button" onClick={handleDelete} disabled={form.processing} variant="destructive">
+                        {form.processing ? __('common.deleting') : __('common.delete')}
                     </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>

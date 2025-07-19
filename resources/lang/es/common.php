@@ -39,15 +39,15 @@ return [
     'profile' => "Perfil",
     'logout' => "Cerrar sesión",
 
-
-
     'actions' => [
+        'close' => "Cerrar",
         'cancel' => "Cancelar",
         'update' => "Actualizar",
         'create' => "Crear",
         'save_changes' => "Guardar cambios",
         'confirm' => "Confirmar",
         'delete' => "Eliminar",
+        'manage_servers' => "Administrar Servidores",
     ],
 
     'loaders' => [
@@ -80,7 +80,8 @@ return [
         'name_mal' => 'nombre en MyAnimeList',
         'email' => 'correo electrónico',
         'name' => 'nombre',
-        'embed' => 'dominio'
+        'embed' => 'dominio',
+        'number' => 'número',
     ],
 
 ];

@@ -28,6 +28,8 @@ export default function Index({ animes, filters }: any) {
         if (flash.error) toast.error(flash.error);
     }, [flash]);
 
+    const [animeDialogOpen, setAnimeDialogOpen] = React.useState(false);
+
     React.useEffect(() => {
         if (search === initialSearch) return;
 
@@ -48,30 +50,30 @@ export default function Index({ animes, filters }: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={__('animes.index_page.title')} />
-            <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between">
-                    <div className="space-y-1">
+            <div className="space-y-6 p-2 lg:p-4">
+                <div className="grid grid-cols-1 items-center justify-between gap-4 sm:grid-cols-2">
+                    <div className="space-y-1 text-center sm:text-left">
                         <h1 className="text-2xl font-semibold">{__('animes.index_page.title')}</h1>
                         <p className="text-sm text-muted-foreground">{__('animes.index_page.description')}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2 sm:justify-end">
                         <Button asChild>
-                            <Link href={route('animes.create')}>
-                                <Plus /> {__('animes.create.button')}
+                            <Link href={route().has('animes.create') ? route('animes.create') : '#'}>
+                                <Plus /> {__('animes.buttons.add')}
                             </Link>
                         </Button>
-                        <AnimeDialogGenerate />
+                        <AnimeDialogGenerate open={animeDialogOpen} setOpen={setAnimeDialogOpen} />
                     </div>
                 </div>
 
                 <Card>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 p-2 md:p-4">
                         <div className="flex items-center gap-2">
                             <Input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder={__('common.placeholders.search_multiple', {
-                                    fields: ['name', 'name_alternative'].map((field) => __('animes.fields.' + field)).join(', '),
+                                    fields: ['name', 'name_alternative'].map((field) => __('animes.labels.' + field)).join(', '),
                                 })}
                                 className="max-w-sm"
                             />

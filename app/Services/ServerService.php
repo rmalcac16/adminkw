@@ -11,6 +11,13 @@ class ServerService
     protected string $cacheKey = 'servers.all';
     protected string $cacheTag = 'servers';
 
+    protected function cache()
+    {
+        return $this->supportsTags()
+            ? Cache::tags($this->cacheTag)
+            : Cache::store();
+    }
+
     protected function supportsTags(): bool
     {
         return in_array(config('cache.default'), ['redis', 'memcached']);
@@ -18,25 +25,19 @@ class ServerService
 
     public function getAll(): Collection
     {
-        if ($this->supportsTags()) {
-            return Cache::tags($this->cacheTag)->rememberForever($this->cacheKey, function () {
-                return Server::orderBy('id', 'desc')->get();
-            });
-        }
-
-        return Cache::rememberForever($this->cacheKey, function () {
-            return Server::orderBy('id', 'desc')->get();
+        return $this->cache()->rememberForever($this->cacheKey, function () {
+            return Server::orderByDesc('id')->get();
         });
     }
 
-    public function create(array $data): ?Server
+    public function create(array $data): Server
     {
         $server = Server::create($data);
         $this->flushCache();
         return $server;
     }
 
-    public function update(Server $server, array $data): ?Server
+    public function update(Server $server, array $data): Server
     {
         $server->update($data);
         $this->flushCache();
@@ -46,18 +47,16 @@ class ServerService
     public function delete(Server $server): bool
     {
         $deleted = $server->delete();
+
         if ($deleted) {
             $this->flushCache();
         }
+
         return $deleted;
     }
 
     protected function flushCache(): void
     {
-        if ($this->supportsTags()) {
-            Cache::tags($this->cacheTag)->forget($this->cacheKey);
-        } else {
-            Cache::forget($this->cacheKey);
-        }
+        $this->cache()->forget($this->cacheKey);
     }
 }

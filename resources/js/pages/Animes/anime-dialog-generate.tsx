@@ -18,10 +18,9 @@ import { Building, LoaderIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-export function AnimeDialogGenerate() {
+export function AnimeDialogGenerate({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
     const { __ } = useLang();
 
-    const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -64,7 +63,6 @@ export function AnimeDialogGenerate() {
 
     const handleSelectedAnime = (item: any) => {
         setSelectedAnime(item);
-
         const animeData = {
             name: item.title || item.name || '',
             overview: item.overview || '',
@@ -77,32 +75,23 @@ export function AnimeDialogGenerate() {
             type: item.media_type === 'movie' ? 'Movie' : 'TV',
             status: 0,
         };
-
         setData(animeData);
     };
 
     const handleImport = () => {
-        if (data === null) {
-            toast.error(__('animes.generate.noData'));
-            return;
-        }
-
-        setTimeout(() => {
-            post(route('animes.store'), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    if (data.tmdb_id) {
-                        setImportedAnimeIds((prev) => [...prev, data.tmdb_id!]);
-                    }
-                    setData({});
-                },
-                onError: () => {
-                    console.error('Error importing anime:', errors);
-                    const firstError = Object.values(errors)[0];
-                    toast.error(firstError || __('animes.generate.failed'));
-                },
-            });
-        }, 0);
+        post(route('animes.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                if (data.tmdb_id) {
+                    setImportedAnimeIds((prev) => [...prev, data.tmdb_id!]);
+                }
+                setData({});
+            },
+            onError: () => {
+                const firstError = Object.values(errors)[0];
+                toast.error(firstError || __('animes.generate.failed'));
+            },
+        });
     };
 
     return (
@@ -110,18 +99,18 @@ export function AnimeDialogGenerate() {
             <DialogTrigger asChild>
                 <Button variant="secondary">
                     <Building />
-                    {__('animes.generate.button')}
+                    {__('animes.buttons.generate')}
                 </Button>
             </DialogTrigger>
 
             <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-5xl">
                 <DialogHeader>
-                    <DialogTitle>{__('animes.generate.title')}</DialogTitle>
-                    <DialogDescription>{__('animes.generate.description')}</DialogDescription>
+                    <DialogTitle>{__('animes.actions.generate')}</DialogTitle>
+                    <DialogDescription>{__('animes.actions.generate_description')}</DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                    <Input placeholder={__('animes.generate.search_placeholder')} value={query} onChange={(e) => setQuery(e.target.value)} />
+                    <Input placeholder={__('animes.placeholders.search_generate')} value={query} onChange={(e) => setQuery(e.target.value)} />
 
                     {loading && (
                         <div className="flex items-center justify-center py-4">

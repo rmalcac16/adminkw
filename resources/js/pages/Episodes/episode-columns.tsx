@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
 import { formatDate } from '@/utils/dates';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Film, Tv2Icon } from 'lucide-react';
 
@@ -18,14 +19,17 @@ export function getEpisodeColumns(__: (key: string) => string, anime: AnimeData)
             cell: ({ row }) => {
                 const isLatest = row.index === 0;
                 return (
-                    <span className="font-semibold">
+                    <Link
+                        href={route().has('players.index') ? route('players.index', { anime: anime.id, episode: row.original.id }) : '#'}
+                        className="font-semibold"
+                    >
                         {__('episodes.labels.episode')} {row.original.number}
                         {isLatest && (
                             <Badge className="ml-2" variant="outline">
                                 {__('common.latest')}
                             </Badge>
                         )}
-                    </span>
+                    </Link>
                 );
             },
         },

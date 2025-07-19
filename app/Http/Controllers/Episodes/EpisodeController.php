@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Episodes;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Episodes\StoreEpisodeRequest;
 use App\Http\Requests\Episodes\UpdateEpisodeRequest;
+use App\Http\Requests\Episodes\GenerateEpisodePlayersRequest;
 use App\Models\Anime;
 use App\Models\Episode;
 use App\Services\EpisodeService;
+use App\Services\ServerService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,20 +17,24 @@ class EpisodeController extends Controller
 {
 
     protected EpisodeService $episodeService;
+    protected ServerService $serverService;
 
-    public function __construct(EpisodeService $episodeService)
+    public function __construct(EpisodeService $episodeService, ServerService $serverService)
     {
         $this->episodeService = $episodeService;
+        $this->serverService = $serverService;
         syncLangFiles(['episodes']);
     }
 
     public function index(Anime $anime)
     {
         $episodes = $this->episodeService->getAll($anime);
+        $servers = $this->serverService->getAll();
 
         return Inertia::render('Episodes/Index', [
             'anime' => $anime,
             'episodes' => $episodes,
+            'servers' => $servers,
         ]);
     }
 
@@ -51,5 +57,13 @@ class EpisodeController extends Controller
     {
         $this->episodeService->delete($anime, $episode);
         return back()->with('success', __('episodes.messages.deleted', ['number' => $episode->number]));
+    }
+
+
+    public function generatePlayers(GenerateEpisodePlayersRequest $request, Anime $anime)
+    {
+        $validatedData = $request->validated();
+        $this->episodeService->generatePlayers($validatedData, $anime);
+        return back()->with('success', __('episodes.messages.players_generated'));
     }
 }

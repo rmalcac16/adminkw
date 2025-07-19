@@ -22,6 +22,17 @@ class PlayerService
         return "players.episodes.{$episode->id}.animes.{$anime->id}";
     }
 
+    protected function flushPlayerCache(Anime $anime, Episode $episode): void
+    {
+        $cacheKey = $this->getCacheKey($anime, $episode);
+
+        if ($this->supportsTags()) {
+            Cache::tags($this->cacheTag)->forget($cacheKey);
+        } else {
+            Cache::forget($cacheKey);
+        }
+    }
+
     public function getAll(Anime $anime, Episode $episode): Collection
     {
         $key = $this->getCacheKey($anime, $episode);
@@ -32,19 +43,20 @@ class PlayerService
             ->with(['server', 'episode'])
             ->get();
 
-        if ($this->supportsTags()) {
-            return Cache::tags($this->cacheTag)->rememberForever($key, $query);
-        }
-
-        return Cache::rememberForever($key, $query);
+        return $this->supportsTags()
+            ? Cache::tags($this->cacheTag)->rememberForever($key, $query)
+            : Cache::rememberForever($key, $query);
     }
 
     public function create(Anime $anime, Episode $episode, array $data): ?Player
     {
+        $data['created_at'] = '2021-01-01 00:00:00';
         $player = $episode->players()->create($data);
+
         $this->flushPlayerCache($anime, $episode);
         return $player;
     }
+
 
     public function update(Anime $anime, Episode $episode, Player $player, array $data): ?Player
     {
@@ -64,14 +76,25 @@ class PlayerService
         return $deleted;
     }
 
-    protected function flushPlayerCache(Anime $anime, Episode $episode): void
+    public function createOrUpdate(Anime $anime, Episode $episode, array $data): Player
     {
-        $cacheKey = "players.episodes.{$episode->id}.animes.{$anime->id}";
+        $player = Player::where('episode_id', $episode->id)
+            ->where('server_id', $data['server_id'])
+            ->where('languaje', $data['languaje'])
+            ->first();
 
-        if ($this->supportsTags()) {
-            Cache::tags($this->cacheTag)->forget($cacheKey);
+        if ($player) {
+            $player->update([
+                'code' => $data['code'],
+                'code_backup' => $data['code_backup'],
+            ]);
         } else {
-            Cache::forget($cacheKey);
+            $data['created_at'] = '2021-01-01 00:00:00';
+            $player = $episode->players()->create($data);
         }
+
+        $this->flushPlayerCache($anime, $episode);
+
+        return $player;
     }
 }

@@ -1,54 +1,23 @@
-// resources/js/pages/Genres/genre-columns.ts
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AnimeData } from '@/types/anime';
+import { formatDate } from '@/utils/dates';
 import { shortenText } from '@/utils/text';
 import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { CheckIcon, ClockIcon, Edit2, HelpCircleIcon, LoaderIcon, PauseIcon } from 'lucide-react';
-import { JSX } from 'react';
+import { Edit2 } from 'lucide-react';
 import { AnimeDialogDelete } from './anime-dialog-delete';
-
-const statusMap: Record<
-    number,
-    {
-        label: string;
-        icon: JSX.Element;
-        className: string;
-    }
-> = {
-    0: {
-        label: 'animes.status.finished',
-        icon: <CheckIcon />,
-        className: 'bg-gray-500 text-white dark:bg-gray-600',
-    },
-    1: {
-        label: 'animes.status.airing',
-        icon: <LoaderIcon className="animate-spin" />,
-        className: 'bg-green-500 text-white dark:bg-green-600',
-    },
-    2: {
-        label: 'animes.status.paused',
-        icon: <PauseIcon />,
-        className: 'bg-yellow-500 text-white dark:bg-yellow-600',
-    },
-    3: {
-        label: 'animes.status.upcoming',
-        icon: <ClockIcon />,
-        className: 'bg-blue-500 text-white dark:bg-blue-600',
-    },
-};
 
 export function getAnimeColumns(__: (key: string) => string): ColumnDef<AnimeData>[] {
     return [
         {
             accessorKey: 'id',
-            header: __('animes.table.id'),
+            header: __('animes.labels.id'),
             cell: ({ getValue }) => <span className="font-medium">{getValue<number>()}</span>,
         },
         {
             accessorKey: 'name',
-            header: __('animes.table.name'),
+            header: __('animes.labels.name'),
             enableColumnFilter: true,
             cell: ({ row }) => {
                 const name = row.original.name;
@@ -60,7 +29,7 @@ export function getAnimeColumns(__: (key: string) => string): ColumnDef<AnimeDat
                             <div className="max-w-[330px] text-sm font-medium">{shortenText(name)}</div>
 
                             <div className="line-clamp-1 max-w-[330px] text-xs overflow-ellipsis text-muted-foreground">
-                                {name_alternative ? shortenText(name_alternative) : __('common.no_alternative_name')}
+                                {name_alternative ? shortenText(name_alternative) : '--'}
                             </div>
                         </div>
                     </Link>
@@ -69,7 +38,7 @@ export function getAnimeColumns(__: (key: string) => string): ColumnDef<AnimeDat
         },
         {
             accessorKey: 'slug',
-            header: __('animes.table.slug'),
+            header: __('animes.labels.slug'),
             cell: ({ getValue }) => (
                 <div className="max-w-[250px]">
                     <code className="line-clamp-1 inline-block max-w-[250px] overflow-hidden rounded bg-muted px-[0.3rem] py-[0.2rem] text-xs text-ellipsis whitespace-nowrap">
@@ -80,40 +49,47 @@ export function getAnimeColumns(__: (key: string) => string): ColumnDef<AnimeDat
         },
         {
             accessorKey: 'status',
-            header: __('animes.table.status'),
+            header: __('animes.labels.status'),
             cell: ({ getValue }) => {
                 const status = getValue<number>();
-                const config = statusMap[status];
 
-                if (!config) {
-                    return (
-                        <Badge variant="outline">
-                            <HelpCircleIcon />
-                            {__('common.unknown')}
-                        </Badge>
-                    );
-                }
+                const statusMap: Record<number, { className: string }> = {
+                    0: {
+                        className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                    },
+                    1: {
+                        className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                    },
+                    2: {
+                        className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                    },
+                    3: {
+                        className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                    },
+                };
+
+                const { className } = statusMap[status] || {
+                    className: 'bg-muted text-muted-foreground',
+                };
 
                 return (
-                    <Badge variant="secondary" className={config.className}>
-                        {config.icon}
-                        {__(config.label)}
+                    <Badge variant="secondary" className={`${className}`}>
+                        {__(`animes.statuses.${status}`)}
                     </Badge>
                 );
             },
         },
-
         {
             accessorKey: 'aired',
-            header: __('animes.table.aired'),
+            header: __('animes.labels.aired'),
             cell: ({ getValue }) => {
                 const date = getValue<string>();
-                return <span className="text-sm">{date || __('common.unknown')}</span>;
+                return <span className="text-sm">{formatDate(date)}</span>;
             },
         },
         {
             id: 'actions',
-            header: __('animes.table.actions'),
+            header: __('animes.labels.actions'),
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <Button asChild variant="outline" size="icon" className="h-8 w-8">
