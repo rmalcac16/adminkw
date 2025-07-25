@@ -7,7 +7,6 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import { useLang } from '@/hooks/useLang';
 import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
 
@@ -20,7 +19,6 @@ interface Props {
 }
 
 export function DialogFormEpisode({ anime, episode, episodeNumberDefault = 1, open, setOpen }: Props) {
-    const { __ } = useLang();
     const isEdit = !!episode;
 
     const form = useForm<{ number: number | string }>({
@@ -28,25 +26,35 @@ export function DialogFormEpisode({ anime, episode, episodeNumberDefault = 1, op
     });
 
     useEffect(() => {
-        form.setData('number', isEdit && episode ? episode.number : episodeNumberDefault);
-    }, [anime.id, episode?.id, episodeNumberDefault]);
+        if (open) {
+            form.reset();
+            form.setData('number', isEdit && episode ? episode.number : episodeNumberDefault);
+            form.setError('number', '');
+        }
+    }, [open, episode]);
 
     const isUnchanged = isEdit && episode && form.data.number === episode.number;
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        const url = isEdit ? route('episodes.update', { anime: anime.id, episode: episode.id }) : route('episodes.store', { anime: anime.id });
-
-        const options = {
-            preserveScroll: true,
-            onSuccess: () => {
-                form.reset();
-                setOpen(false);
-            },
-        };
-
-        isEdit ? form.put(url, options) : form.post(url, options);
+        if (isEdit) {
+            form.put(route('episodes.update', { anime: anime.id, episode: episode.id }), {
+                onSuccess: () => {
+                    setOpen(false);
+                    form.reset();
+                },
+                preserveScroll: true,
+            });
+        } else {
+            form.post(route('episodes.store', { anime: anime.id }), {
+                onSuccess: () => {
+                    setOpen(false);
+                    form.reset();
+                },
+                preserveScroll: true,
+            });
+        }
     };
 
     return (
@@ -54,25 +62,24 @@ export function DialogFormEpisode({ anime, episode, episodeNumberDefault = 1, op
             <DialogContent>
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>{isEdit ? __('episodes.actions.edit') : __('episodes.actions.create')}</DialogTitle>
+                        <DialogTitle>{isEdit ? 'Editar episodio' : 'Crear episodio'}</DialogTitle>
                         <DialogDescription>
-                            {isEdit
-                                ? __('episodes.actions.edit_description', { number: episode?.number })
-                                : __('episodes.actions.create_description')}
+                            {isEdit ? `Edita el episodio #${episode?.number}.` : 'Completa el formulario para crear un nuevo episodio.'}
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="number">{__('episodes.labels.number')}</Label>
+                            <Label htmlFor="number">Número de episodio</Label>
                             <Input
                                 id="number"
                                 type="number"
                                 min={0}
                                 value={form.data.number}
                                 onChange={(e) => form.setData('number', e.target.value === '' ? '' : Number(e.target.value))}
-                                placeholder={__('episodes.placeholders.number')}
+                                placeholder="Ingresa el número del episodio"
                                 required
+                                disabled={form.processing}
                             />
                             <InputError className="text-xs" message={form.errors.number} />
                         </div>
@@ -81,17 +88,11 @@ export function DialogFormEpisode({ anime, episode, episodeNumberDefault = 1, op
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button type="button" variant="outline">
-                                {__('common.actions.cancel')}
+                                Cancelar
                             </Button>
                         </DialogClose>
                         <Button type="submit" disabled={form.processing || isUnchanged}>
-                            {form.processing
-                                ? isEdit
-                                    ? __('common.loaders.updating')
-                                    : __('common.loaders.creating')
-                                : isEdit
-                                  ? __('common.actions.update')
-                                  : __('common.actions.create')}
+                            {form.processing ? (isEdit ? 'Actualizando...' : 'Creando...') : isEdit ? 'Actualizar' : 'Crear'}
                         </Button>
                     </DialogFooter>
                 </form>

@@ -11,4 +11,5 @@ export interface PlayerData {
     episode: EpisodeData;
     created_at: string;
     updated_at: string;
+    code_backup?: string;
 }

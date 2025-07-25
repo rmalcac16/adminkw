@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Link } from '@inertiajs/react';
 
 interface FilterField {
     field: string;
@@ -177,21 +178,29 @@ export function DataTable<TData, TValue>({
                             table.getRowModel().rows.map((row) => {
                                 const rowLink = getRowLink?.(row.original);
                                 return (
-                                    <TableRow
-                                        key={row.id}
-                                        onClick={() => rowLink && (window.location.href = rowLink)}
-                                        className={rowLink ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell
-                                                key={cell.id}
-                                                onClick={(e) => {
-                                                    if (cell.column.id === 'actions') e.stopPropagation();
-                                                }}
-                                            >
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
+                                    <TableRow key={row.id} className={rowLink ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}>
+                                        {row.getVisibleCells().map((cell) => {
+                                            const isActions = cell.column.id === 'actions';
+                                            const cellContent = (
+                                                <TableCell
+                                                    key={cell.id}
+                                                    onClick={(e) => {
+                                                        if (isActions) e.stopPropagation();
+                                                    }}
+                                                >
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            );
+
+                                            // Si hay rowLink y no es la columna de acciones, envolvemos en <Link>
+                                            return rowLink && !isActions ? (
+                                                <Link href={rowLink} key={cell.id} className="contents">
+                                                    {cellContent}
+                                                </Link>
+                                            ) : (
+                                                cellContent
+                                            );
+                                        })}
                                     </TableRow>
                                 );
                             })

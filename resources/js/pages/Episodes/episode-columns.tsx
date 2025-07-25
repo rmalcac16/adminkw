@@ -3,7 +3,7 @@ import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
 import { formatDate } from '@/utils/dates';
 import { ColumnDef } from '@tanstack/react-table';
-import { AppWindow, Globe, PlayCircle } from 'lucide-react';
+import { AppWindow, Globe } from 'lucide-react';
 
 export function getEpisodeColumns(anime: AnimeData): ColumnDef<EpisodeData>[] {
     return [
@@ -22,7 +22,6 @@ export function getEpisodeColumns(anime: AnimeData): ColumnDef<EpisodeData>[] {
                 return (
                     <div className="w-[300px]">
                         <div className="flex items-center gap-2 leading-tight font-semibold">
-                            <PlayCircle className="h-4 w-4 text-primary" />
                             Episodio {episodeNumber}
                             {isLatest && (
                                 <Badge className="ml-2" variant="default">
@@ -44,7 +43,7 @@ export function getEpisodeColumns(anime: AnimeData): ColumnDef<EpisodeData>[] {
             accessorKey: 'views',
             header: 'Vistas Web',
             cell: ({ getValue }) => (
-                <Badge variant="secondary" className="inline-flex items-center gap-1">
+                <Badge variant="secondary">
                     <Globe className="h-4 w-4" />
                     {getValue<number>()}
                 </Badge>
@@ -54,7 +53,7 @@ export function getEpisodeColumns(anime: AnimeData): ColumnDef<EpisodeData>[] {
             accessorKey: 'views_app',
             header: 'Vistas App',
             cell: ({ getValue }) => (
-                <Badge className="inline-flex items-center gap-1">
+                <Badge>
                     <AppWindow className="h-4 w-4" />
                     {getValue<number>()}
                 </Badge>

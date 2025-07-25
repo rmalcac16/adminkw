@@ -223,10 +223,8 @@ export function DialogGenerateEpisodesPlayers({
                 setInvalidLines([]);
                 setEpisodeFinal('0');
                 hasUserSelectedServer.current = false;
-                toast.success('¡Reproductores generados exitosamente!');
             },
             onError: (errors) => {
-                console.error('Error al generar reproductores:', errors);
                 toast.error('Hubo un error al generar los reproductores.');
             },
         });

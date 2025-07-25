@@ -14,18 +14,19 @@ class StoreEpisodeRequest extends FormRequest
     public function rules(): array
     {
         $anime = $this->route('anime');
+
         return [
-            'number' => ['required', 'integer', 'min:1', 'unique:episodes,number,NULL,id,anime_id,' . $anime->id],
+            'number' => ['required', 'integer', 'min:0', 'unique:episodes,number,NULL,id,anime_id,' . $anime->id],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'number.required' => __('episodes.validation.number_required'),
-            'number.integer' => __('episodes.validation.number_integer'),
-            'number.min' => __('episodes.validation.number_min', ['min' => 1]),
-            'number.unique' => __('episodes.validation.number_unique'),
+            'number.required' => 'El número del episodio es obligatorio.',
+            'number.integer' => 'El número del episodio debe ser un número entero.',
+            'number.min' => 'El número del episodio debe ser como mínimo 0.',
+            'number.unique' => 'Ya existe un episodio con ese número para este anime.',
         ];
     }
 }

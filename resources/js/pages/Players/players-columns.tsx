@@ -1,94 +1,135 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { PlayerData } from '@/types/player';
-import { ServerData } from '@/types/server';
 import { formatDate } from '@/utils/dates';
 import { ColumnDef } from '@tanstack/react-table';
-import { CopyIcon, GlobeIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { PlayerDialogDelete } from './player-dialog-delete';
-import { PlayerDialogForm } from './player-dialog-form';
 
-export function getPlayerColumns(__: (key: string) => string, servers: ServerData[]): ColumnDef<PlayerData>[] {
+export function getPlayerColumns(): ColumnDef<PlayerData>[] {
     return [
         {
             accessorKey: 'id',
-            header: __('players.table.id'),
+            header: 'ID',
             cell: ({ getValue }) => <span className="font-medium">{getValue<number>()}</span>,
         },
         {
-            accessorKey: 'server.name',
-            header: __('players.table.server'),
+            accessorKey: 'server',
+            header: 'Servidor',
             cell: ({ row }) => <Badge variant="secondary">{row.original.server?.title || '—'}</Badge>,
         },
         {
             accessorKey: 'languaje',
-            header: __('players.table.language'),
+            header: 'Idioma',
             cell: ({ getValue }) => {
                 const lang = getValue<number>();
 
-                const langVariants: Record<number, { label: string; variant: 'default' | 'secondary' | 'outline'; className?: string }> = {
-                    0: { label: __('players.languages.0'), variant: 'outline', className: 'bg-green-700' },
-                    1: { label: __('players.languages.1'), variant: 'default', className: '' },
-                    2: { label: __('players.languages.2'), variant: 'secondary', className: '' },
+                const langMap: Record<number, { label: string; gradient: string }> = {
+                    0: {
+                        label: 'Subtitulado',
+                        gradient: 'bg-[linear-gradient(to_right,white_0%,white_50%,#bc002d_50%,#bc002d_100%)]',
+                    },
+                    1: {
+                        label: 'Español Latino',
+                        gradient: 'bg-[linear-gradient(to_right,#006847_0%,white_50%,#ce1126_100%)]',
+                    },
+                    2: {
+                        label: 'Castellano',
+                        gradient: 'bg-[linear-gradient(to_right,#aa151b_0%,#f1bf00_50%,#aa151b_100%)]',
+                    },
                 };
 
-                const language = langVariants[lang] ?? { label: 'Desconocido', variant: 'outline' };
+                const language = langMap[lang] ?? {
+                    label: 'Desconocido',
+                    gradient: 'bg-[linear-gradient(to_right,#ccc,#eee)]',
+                };
 
                 return (
-                    <Badge variant={language.variant} className={language.className}>
-                        <GlobeIcon className="mr-1 h-4 w-4" />
-                        {language.label}
-                    </Badge>
+                    <span className={`relative inline-block text-sm font-medium`}>
+                        <span className="relative z-10">{language.label}</span>
+                        <span
+                            className={`absolute bottom-0 left-0 h-[2px] w-full ${language.gradient} bg-[length:100%_2px] bg-no-repeat`}
+                            aria-hidden="true"
+                        />
+                    </span>
                 );
             },
         },
         {
             accessorKey: 'code',
-            header: __('players.table.code'),
+            header: 'Código',
             cell: ({ row, getValue }) => {
                 const url = getValue<string>();
                 let serverEmbed = row.original.server?.embed ?? '—';
                 serverEmbed = serverEmbed.replace(/\/+$/, '');
                 const urlCode = serverEmbed + '/e/' + url;
-
-                const handleCopy = () => {
-                    navigator.clipboard.writeText(urlCode);
-                    toast.success('Embed copiado al portapapeles');
-                };
-
                 return (
-                    <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="max-w-[360px] truncate">
-                            {urlCode}
-                        </Badge>
-                        <Button size="icon" variant="ghost" onClick={handleCopy} className="size-4 cursor-pointer">
-                            <CopyIcon className="text-muted-foreground" />
-                        </Button>
-                    </div>
+                    <ContextMenu>
+                        <ContextMenuTrigger>
+                            <Badge variant="secondary" className="line-clamp-1 max-w-[300px] truncate overflow-hidden">
+                                {urlCode}
+                            </Badge>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent className="w-64">
+                            <ContextMenuItem
+                                inset
+                                onClick={() => {
+                                    navigator.clipboard.writeText(urlCode);
+                                    toast.success('Copiado al portapapeles');
+                                }}
+                            >
+                                Copiar enlace
+                            </ContextMenuItem>
+                            <ContextMenuItem inset onClick={() => window.open(urlCode, '_blank')}>
+                                Abrir en una nueva pestaña
+                            </ContextMenuItem>
+                        </ContextMenuContent>
+                    </ContextMenu>
+                );
+            },
+        },
+        {
+            accessorKey: 'code_backup',
+            header: 'Código de respaldo',
+            cell: ({ row, getValue }) => {
+                const urlCode = getValue<string>() || '—';
+                return (
+                    <ContextMenu>
+                        <ContextMenuTrigger>
+                            <Badge variant="outline" className="line-clamp-1 max-w-[240px] truncate overflow-hidden">
+                                {urlCode}
+                            </Badge>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent className="w-64">
+                            <ContextMenuItem
+                                inset
+                                onClick={() => {
+                                    navigator.clipboard.writeText(urlCode);
+                                    toast.success('Enlace copiado al portapapeles');
+                                }}
+                            >
+                                Copiar enlace
+                            </ContextMenuItem>
+                            <ContextMenuItem inset onClick={() => window.open(urlCode, '_blank')}>
+                                Abrir en una nueva pestaña
+                            </ContextMenuItem>
+                        </ContextMenuContent>
+                    </ContextMenu>
                 );
             },
         },
         {
             accessorKey: 'created_at',
-            header: __('players.table.created_at'),
+            header: 'Fecha de creación',
+            cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{formatDate(getValue<string>())}</span>,
+        },
+        {
+            accessorKey: 'updated_at',
+            header: 'Fecha de actualización',
             cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{formatDate(getValue<string>())}</span>,
         },
         {
             id: 'actions',
-            header: __('players.table.actions'),
-            cell: ({ row }) => (
-                <div className="flex gap-2">
-                    <PlayerDialogForm
-                        servers={servers}
-                        animeId={row.original.episode.anime_id}
-                        episodeId={row.original.episode.id}
-                        player={row.original}
-                        triggerType="icon"
-                    />
-                    <PlayerDialogDelete animeId={row.original.episode.anime_id} episodeId={row.original.episode.id} player={row.original} />
-                </div>
-            ),
+            header: 'Acciones',
         },
     ];
 }

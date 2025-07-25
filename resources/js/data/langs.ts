@@ -7,16 +7,11 @@ export const languages = [
     {
         key: 1,
         value: '1',
-        label: 'Español Latino',
+        label: 'Latino',
     },
     {
         key: 2,
         value: '2',
-        label: 'Español Castellano',
-    },
-    {
-        key: 3,
-        value: '3',
-        label: 'Portugués',
+        label: 'Castellano',
     },
 ];
