@@ -1,53 +1,55 @@
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ServerData } from '@/types/server';
+import { IconCircleCheckFilled, IconCircleXFilled } from '@tabler/icons-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { AppWindow, CheckIcon, Monitor, Smartphone, XCircle } from 'lucide-react';
-import { ServerDialogForm } from './server-dialog-form';
 
-export function getServerColumns(__: (key: string) => string): ColumnDef<ServerData>[] {
+export function getServerColumns(): ColumnDef<ServerData>[] {
     return [
         {
             accessorKey: 'id',
-            header: __('servers.table.id'),
+            header: 'ID',
             cell: ({ getValue }) => <span className="font-medium">{getValue<number>()}</span>,
         },
         {
             accessorKey: 'title',
-            header: __('servers.table.title'),
+            header: 'Título',
             enableColumnFilter: true,
             cell: ({ getValue }) => <span className="font-medium">{getValue<string>()}</span>,
         },
         {
             accessorKey: 'embed',
-            header: __('servers.table.embed'),
+            header: 'Embed',
             cell: ({ getValue }) => {
                 const embed = getValue<string>();
-                return <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] text-xs">{embed || '—'}</code>;
+                return (
+                    <Badge variant="secondary" className="font-mono text-xs">
+                        {embed || '—'}
+                    </Badge>
+                );
             },
         },
         {
             accessorKey: 'position',
-            header: __('servers.table.position'),
+            header: 'Posición',
             cell: ({ getValue }) => <span className="text-center">{getValue<number>() ?? '—'}</span>,
         },
         {
             accessorKey: 'status',
-            header: __('servers.table.status'),
+            header: 'Estado',
             cell: ({ getValue }) => {
                 const value = getValue<number | null>();
                 const isActive = value == 1;
                 return (
-                    <Badge variant={isActive ? 'default' : 'outline'} className={isActive ? 'bg-green-700 text-white' : 'bg-red-100 text-red-700'}>
+                    <Badge variant="outline">
                         {isActive ? (
                             <>
-                                <CheckIcon />
-                                {__('servers.statuses.active')}
+                                <IconCircleCheckFilled className="h-4 w-4 text-green-500 dark:text-green-400" />
+                                Activo
                             </>
                         ) : (
                             <>
-                                <XCircle />
-                                {__('servers.statuses.inactive')}
+                                <IconCircleXFilled className="h-4 w-4 text-red-500 dark:text-red-400" />
+                                Inactivo
                             </>
                         )}
                     </Badge>
@@ -56,42 +58,36 @@ export function getServerColumns(__: (key: string) => string): ColumnDef<ServerD
         },
         {
             id: 'visibility',
-            header: __('servers.table.visibility'),
+            header: 'Visibilidad',
             cell: ({ row }) => {
                 const server = row.original;
 
                 const items = [
                     {
                         active: server.show_on_web_desktop,
-                        label: __('servers.table.web_desktop'),
-                        icon: Monitor,
+                        label: 'Escritorio',
                     },
                     {
                         active: server.show_on_web_mobile,
-                        label: __('servers.table.web_mobile'),
-                        icon: Smartphone,
+                        label: 'Móvil',
                     },
                     {
                         active: server.show_on_app,
-                        label: __('servers.table.app'),
-                        icon: AppWindow,
+                        label: 'App',
                     },
                 ];
 
                 return (
-                    <div className="flex items-center gap-2">
-                        {items.map(({ active, label, icon: Icon }, index) => (
-                            <Tooltip key={index}>
-                                <TooltipTrigger asChild>
-                                    <Badge
-                                        variant={active ? 'default' : 'outline'}
-                                        className={active ? 'bg-green-700 text-white' : 'text-muted-foreground'}
-                                    >
-                                        <Icon />
-                                    </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">{label}</TooltipContent>
-                            </Tooltip>
+                    <div className="flex items-center justify-center gap-1">
+                        {items.map(({ active, label }, index) => (
+                            <Badge key={index} variant={'outline'}>
+                                {active ? (
+                                    <IconCircleCheckFilled className="h-4 w-4 text-green-500" />
+                                ) : (
+                                    <IconCircleXFilled className="h-4 w-4 text-red-500" />
+                                )}
+                                <span>{label}</span>
+                            </Badge>
                         ))}
                     </div>
                 );
@@ -99,7 +95,7 @@ export function getServerColumns(__: (key: string) => string): ColumnDef<ServerD
         },
         {
             accessorKey: 'domains',
-            header: __('players.table.domains'),
+            header: 'Dominios',
             cell: ({ row }) => {
                 const domains = row.original.domains ?? [];
 
@@ -110,7 +106,7 @@ export function getServerColumns(__: (key: string) => string): ColumnDef<ServerD
                 return (
                     <div className="flex flex-wrap gap-1">
                         {domains.map((domain: string, i: number) => (
-                            <Badge key={i} variant="secondary" className="cursor-pointer">
+                            <Badge key={i} variant="secondary">
                                 {domain}
                             </Badge>
                         ))}
@@ -120,12 +116,7 @@ export function getServerColumns(__: (key: string) => string): ColumnDef<ServerD
         },
         {
             id: 'actions',
-            header: __('servers.table.actions'),
-            cell: ({ row }) => (
-                <div className="flex items-center gap-2">
-                    <ServerDialogForm server={row.original} triggerType="icon" />
-                </div>
-            ),
+            header: 'Acciones',
         },
     ];
 }

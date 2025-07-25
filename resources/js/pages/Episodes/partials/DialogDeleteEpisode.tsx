@@ -1,31 +1,21 @@
-'use client';
-
 import { useForm } from '@inertiajs/react';
-import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { route } from 'ziggy-js';
+import { DialogClose } from '@radix-ui/react-dialog';
 
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { useLang } from '@/hooks/useLang';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+import { AnimeData } from '@/types/anime';
 import { EpisodeData } from '@/types/episode';
+import { AlertTriangle } from 'lucide-react';
 
 interface Props {
+    anime: AnimeData;
     episode: EpisodeData;
+    open: boolean;
+    setOpen: (open: boolean) => void;
 }
 
-export default function DialogDeleteEpisode({ episode }: Props) {
-    const { __ } = useLang();
-    const [open, setOpen] = useState(false);
+export default function DialogDeleteEpisode({ anime, episode, open, setOpen }: Props) {
     const form = useForm({});
 
     const handleDelete = () => {
@@ -42,25 +32,28 @@ export default function DialogDeleteEpisode({ episode }: Props) {
     };
 
     return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon" className="size-8" disabled={form.processing}>
-                    <Trash2 />
-                </Button>
-            </AlertDialogTrigger>
+        <Dialog open={open} onOpenChange={setOpen} modal>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        Eliminar episodio
+                    </DialogTitle>
+                    <DialogDescription>
+                        ¿Estás seguro de que deseas eliminar el episodio <span className="font-semibold">#{episode.number}</span> de{' '}
+                        <span className="font-semibold">{anime.name}</span>? Esta acción no se puede deshacer.
+                    </DialogDescription>
+                </DialogHeader>
 
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{__('episodes.actions.delete')}</AlertDialogTitle>
-                    <AlertDialogDescription>{__('episodes.actions.delete_description', { number: episode.number })}</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={form.processing}>{__('common.actions.cancel')}</AlertDialogCancel>
+                <DialogFooter>
+                    <DialogClose asChild disabled={form.processing}>
+                        <Button variant="outline">Cancelar</Button>
+                    </DialogClose>
                     <Button onClick={handleDelete} disabled={form.processing} variant="destructive">
-                        {form.processing ? __('common.loaders.deleting') : __('common.actions.confirm')}
+                        {form.processing ? 'Eliminando...' : 'Eliminar'}
                     </Button>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

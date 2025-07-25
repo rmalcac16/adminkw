@@ -22,7 +22,9 @@ export default function AlternativeNamesInputTags({ value, onChange, placeholder
                   .map((v) => v.trim())
                   .filter(Boolean)
             : [];
-        setItems(values);
+        // Eliminar duplicados al cargar desde el prop
+        const unique = Array.from(new Set(values));
+        setItems(unique);
     }, [value]);
 
     const updateItems = (newItems: string[]) => {
@@ -73,8 +75,13 @@ export default function AlternativeNamesInputTags({ value, onChange, placeholder
             className="flex cursor-text flex-wrap items-center gap-2 rounded-md border border-input px-3 py-2 text-xs"
             onClick={() => inputRef.current?.focus()}
         >
-            {items.map((item) => (
-                <Badge key={item} variant="secondary" className="flex cursor-default items-center gap-1" onClick={(e) => e.stopPropagation()}>
+            {items.map((item, index) => (
+                <Badge
+                    key={`${item}-${index}`}
+                    variant="secondary"
+                    className="flex cursor-default items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                >
                     {item}
                     <button
                         type="button"

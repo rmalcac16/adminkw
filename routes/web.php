@@ -7,7 +7,9 @@ use App\Http\Controllers\Episodes\EpisodeController;
 use App\Http\Controllers\Genres\GenreController;
 use App\Http\Controllers\Players\PlayerController;
 use App\Http\Controllers\Servers\ServerController;
+use App\Http\Controllers\Uploads\UploadController;
 use App\Http\Controllers\Users\UserController;
+use App\Services\UploadServerService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('animes', AnimeController::class);
     Route::resource('servers', ServerController::class)->names('servers')->only(['index', 'store', 'update', 'destroy']);
 
+    Route::post('animes/{anime}/episodes/upload', [EpisodeController::class, 'upload'])->name('episodes.upload');
     Route::post('animes/{anime}/episodes/generate-players', [EpisodeController::class, 'generatePlayers'])->name('episodes.generate-players');
     Route::resource('animes.episodes', EpisodeController::class)->names('episodes')->only(['index', 'store', 'update', 'destroy']);
     Route::resource('animes.episodes.players', PlayerController::class)->names('players')->only(['index', 'store', 'update', 'destroy']);
@@ -40,6 +43,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/cache/animes/{anime}/episodes/clear', [CacheController::class, 'clearEpisodeCache'])
         ->name('cache.episodes.clear');
     Route::post('/cache/animes/{anime}/episodes/{episode}/players/clear', [CacheController::class, 'clearPlayerCache'])->name('cache.players.clear');
+
+
+    Route::get('upload/servers', [UploadController::class, 'getServers'])->name('upload.servers');
 });
 
 

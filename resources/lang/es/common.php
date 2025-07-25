@@ -84,4 +84,12 @@ return [
         'number' => 'número',
     ],
 
+
+    'languages' => [
+        'subbed' => 'Subtitulado',
+        'spanish_latino' => 'Latino',
+        'spanish_castilian' => 'Castellano',
+        'portuguese' => 'Portugués',
+    ],
+
 ];

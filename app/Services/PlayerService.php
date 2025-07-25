@@ -52,7 +52,6 @@ class PlayerService
     {
         $data['created_at'] = '2021-01-01 00:00:00';
         $player = $episode->players()->create($data);
-
         $this->flushPlayerCache($anime, $episode);
         return $player;
     }

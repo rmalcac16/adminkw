@@ -60,6 +60,7 @@ return [
         'episode_initial' => 'Episodio Inicial',
         'episode_final' => 'Episodio Final',
         'language' => 'Idioma',
+        'file' => 'Archivo',
     ],
 
     /*
@@ -132,10 +133,11 @@ return [
         'anime_not_found' => 'Anime no encontrado.',
     ],
 
-    'languages' => [
-        'sub' => 'Subtitulado',
-        'lat' => 'Latino',
-        'cas' => 'Castellano',
+    'errors' => [
+        'upload_failed' => 'Error al subir el episodio. Por favor, inténtelo de nuevo.',
+        'invalid_file_type' => 'El archivo debe ser un video en formato MP4.',
+        'file_size' => 'El tamaño del archivo no debe exceder 1GB.',
+        'invalid_episode_range' => 'El rango de episodios es inválido.',
     ],
 
 ];

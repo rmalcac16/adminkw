@@ -6,7 +6,9 @@ use App\Models\Anime;
 use App\Models\Episode;
 use App\Models\Server;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class EpisodeService
@@ -126,5 +128,30 @@ class EpisodeService
         }
 
         throw new InvalidArgumentException('URL inválida: no se pudo extraer el ID.');
+    }
+
+
+    public function upload(Anime $anime, array $data): void
+    {
+
+        // $episode = $anime->episodes()->updateOrCreate(
+        //     ['number' => $data['number']]
+        // );
+
+        // $this->flushCache($anime);
+
+
+
+        // if ($responseUpload['status'] === 'ok') {
+        //     $this->playerService->createOrUpdate($anime, $episode, [
+        //         'server_id' => $data['server_id'],
+        //         'languaje' => $data['language'],
+        //         'code' => $responseUpload['code'],
+        //         'code_backup' => $responseUpload['code_backup'],
+        //     ]);
+        // } else {
+        //     Log::error("Error uploading episode: {$responseUpload['message']}");
+        //     throw new \Exception($responseUpload['message']);
+        // }
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Episodes\StoreEpisodeRequest;
 use App\Http\Requests\Episodes\UpdateEpisodeRequest;
 use App\Http\Requests\Episodes\GenerateEpisodePlayersRequest;
+use App\Http\Requests\Episodes\UploadEpisodeRequest;
 use App\Models\Anime;
 use App\Models\Episode;
 use App\Services\EpisodeService;
@@ -15,7 +16,6 @@ use Inertia\Inertia;
 
 class EpisodeController extends Controller
 {
-
     protected EpisodeService $episodeService;
     protected ServerService $serverService;
 
@@ -65,5 +65,14 @@ class EpisodeController extends Controller
         $validatedData = $request->validated();
         $this->episodeService->generatePlayers($validatedData, $anime);
         return back()->with('success', __('episodes.messages.players_generated'));
+    }
+
+
+    // Upload functionality
+    public function upload(UploadEpisodeRequest $request, Anime $anime)
+    {
+        $validatedData = $request->validated();
+        $this->episodeService->upload($anime, $validatedData);
+        return back()->with('success', __('episodes.messages.uploaded'));
     }
 }

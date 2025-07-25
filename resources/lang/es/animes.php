@@ -143,13 +143,101 @@ return [
     |--------------------------------------------------------------------------
     */
     'validation' => [
-        'name_required' => 'El nombre del anime es obligatorio.',
-        'short_name_unique' => 'El nombre corto ya ha sido utilizado.',
-        'slug_required' => 'El slug es obligatorio.',
-        'aired_date' => 'La fecha de emisión debe ser una fecha válida.',
-        'type_required' => 'El tipo de anime es obligatorio.',
-        'status_required' => 'El estado del anime es obligatorio.',
-        'tmdb_id_unique' => 'El ID de TMDB ya existe.',
+        'name' => [
+            'required' => 'El nombre del anime es obligatorio.',
+            'max' => 'El nombre no debe superar los 255 caracteres.',
+            'string' => 'El nombre debe ser una cadena de texto.',
+        ],
+        'name_alternative' => [
+            'max' => 'El nombre alternativo no debe superar los 255 caracteres.',
+            'string' => 'El nombre alternativo debe ser una cadena de texto.',
+        ],
+        'slug' => [
+            'max' => 'El slug no debe superar los 255 caracteres.',
+            'string' => 'El slug debe ser una cadena de texto.',
+        ],
+        'banner' => [
+            'max' => 'La URL del banner no debe superar los 255 caracteres.',
+            'string' => 'El banner debe ser una cadena de texto.',
+        ],
+        'poster' => [
+            'max' => 'La URL del póster no debe superar los 255 caracteres.',
+            'string' => 'El póster debe ser una cadena de texto.',
+        ],
+        'overview' => [
+            'string' => 'La descripción debe ser una cadena de texto.',
+        ],
+        'aired' => [
+            'date' => 'La fecha de emisión debe ser válida.',
+        ],
+        'type' => [
+            'in' => 'El tipo de anime debe ser uno de los siguientes: TV, Movie, OVA, ONA, Special.',
+        ],
+        'status' => [
+            'in' => 'El estado seleccionado no es válido.',
+        ],
+        'premiered' => [
+            'max' => 'El campo de estreno no debe superar los 255 caracteres.',
+            'string' => 'El campo de estreno debe ser una cadena de texto.',
+        ],
+        'broadcast' => [
+            'between' => 'El valor de broadcast debe estar entre 1 y 7.',
+            'integer' => 'El campo broadcast debe ser un número entero.',
+        ],
+        'genres' => [
+            'max' => 'Los géneros no deben superar los 255 caracteres.',
+            'string' => 'Los géneros deben ser una cadena de texto.',
+        ],
+        'rating' => [
+            'max' => 'La clasificación no debe superar los 50 caracteres.',
+            'string' => 'La clasificación debe ser una cadena de texto.',
+        ],
+        'popularity' => [
+            'integer' => 'La popularidad debe ser un número entero.',
+            'min' => 'La popularidad no puede ser negativa.',
+        ],
+        'trailer' => [
+            'url' => 'La URL del tráiler no es válida.',
+            'max' => 'La URL del tráiler no debe superar los 255 caracteres.',
+        ],
+        'vote_average' => [
+            'numeric' => 'El promedio de votos debe ser un número.',
+            'min' => 'El promedio de votos no puede ser menor que 0.',
+            'max' => 'El promedio de votos no puede ser mayor que 10.',
+        ],
+        'prequel' => [
+            'exists' => 'El anime prequel seleccionado no existe.',
+        ],
+        'sequel' => [
+            'exists' => 'El anime secuela seleccionado no existe.',
+        ],
+        'related' => [
+            'max' => 'Los animes relacionados no deben superar los 255 caracteres.',
+        ],
+        'views' => [
+            'integer' => 'Las vistas deben ser un número entero.',
+            'min' => 'Las vistas no pueden ser negativas.',
+        ],
+        'views_app' => [
+            'integer' => 'Las vistas en la app deben ser un número entero.',
+            'min' => 'Las vistas en la app no pueden ser negativas.',
+        ],
+        'isTopic' => [
+            'boolean' => 'El campo de tema destacado debe ser verdadero o falso.',
+        ],
+        'mal_id' => [
+            'integer' => 'El ID de MAL debe ser un número entero.',
+            'min' => 'El ID de MAL no puede ser negativo.',
+        ],
+        'tmdb_id' => [
+            'integer' => 'El ID de TMDB debe ser un número entero.',
+            'min' => 'El ID de TMDB no puede ser negativo.',
+        ],
+        'short_name' => [
+            'string' => 'El nombre corto debe ser una cadena de texto.',
+            'max' => 'El nombre corto no debe superar los 255 caracteres.',
+            'unique' => 'Este nombre corto ya está en uso.',
+        ],
     ],
 
 

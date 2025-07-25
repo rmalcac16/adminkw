@@ -1,6 +1,6 @@
 export interface ServerData {
     id: number;
-    title: string | null;
+    title: string;
     embed: string | null;
     status: boolean | null;
     position: number | null;

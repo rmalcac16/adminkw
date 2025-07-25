@@ -114,7 +114,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                         onChange={(e) => setData('short_name', e.target.value)}
                         placeholder={__('animes.placeholders.short_name')}
                     />
-                    <InputError message={errors.slug} className="text-xs" />
+                    <InputError message={errors.short_name} className="text-xs" />
                 </div>
                 <div className="flex flex-col gap-2 lg:col-span-6">
                     <Label htmlFor="name_alternative">{__('animes.labels.name_alternative')}</Label>
@@ -155,12 +155,12 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                             ))}
                         </SelectContent>
                     </Select>
-                    {errors.status && <p className="text-xs text-red-400">{errors.status}</p>}
+                    <InputError message={errors.status} className="text-xs" />
                 </div>
                 <div className="flex flex-col gap-2 lg:col-span-2">
                     <Label htmlFor="aired">{__('animes.labels.aired')}</Label>
                     <DatePicker date={data.aired} onChange={(date) => setData('aired', date)} placeholder={__('animes.placeholders.aired')} />
-                    {errors.aired && <p className="text-xs text-red-400">{errors.aired}</p>}
+                    <InputError message={errors.aired} className="text-xs" />
                 </div>
 
                 <div className="flex flex-col gap-2 lg:col-span-6">

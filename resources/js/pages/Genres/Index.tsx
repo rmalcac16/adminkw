@@ -41,7 +41,16 @@ export default function Index({ genres }: { genres: GenreData[] }) {
 
                 <Card>
                     <CardContent>
-                        <DataTable columns={columns} data={genres} filterFields={['title', 'slug', 'name_mal']} />
+                        <DataTable
+                            columns={columns}
+                            data={genres}
+                            filterFields={[
+                                { field: 'title', label: 'título' },
+                                { field: 'slug', label: 'slug' },
+                                { field: 'name_mal', label: 'nombre mal' },
+                            ]}
+                            pageSizeKey="genres_page_size"
+                        />
                     </CardContent>
                 </Card>
             </div>

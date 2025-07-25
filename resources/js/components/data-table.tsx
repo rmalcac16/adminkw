@@ -1,5 +1,3 @@
-'use client';
-
 import {
     ColumnDef,
     flexRender,
@@ -15,19 +13,24 @@ import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useLang } from '@/hooks/useLang';
+
+interface FilterField {
+    field: string;
+    label: string;
+}
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-    filterFields?: string[];
-
+    filterFields?: FilterField[];
     enableClientPagination?: boolean;
     enableClientSorting?: boolean;
     enableClientFiltering?: boolean;
-
     getRowLink?: (row: TData) => string | undefined;
+    pageSizeKey?: string;
+    paginationOptions?: number[];
 }
 
 export function DataTable<TData, TValue>({
@@ -38,11 +41,38 @@ export function DataTable<TData, TValue>({
     enableClientSorting = true,
     enableClientFiltering = true,
     getRowLink,
+    pageSizeKey,
+    paginationOptions = [5, 10, 20, 50, 100],
 }: DataTableProps<TData, TValue>) {
-    const { __ } = useLang();
-
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [globalFilter, setGlobalFilter] = React.useState('');
+    const [pageIndex, setPageIndex] = React.useState(0);
+    const [pageSize, setPageSize] = React.useState(() => {
+        if (enableClientPagination && pageSizeKey) {
+            try {
+                const storedSize = localStorage.getItem(pageSizeKey);
+                if (storedSize) {
+                    const parsedSize = Number(storedSize);
+                    if (paginationOptions.includes(parsedSize)) {
+                        return parsedSize;
+                    }
+                }
+            } catch (error) {
+                console.error('Error al leer pageSize desde localStorage:', error);
+            }
+        }
+        return paginationOptions[0] || 10;
+    });
+
+    React.useEffect(() => {
+        if (enableClientPagination && pageSizeKey) {
+            try {
+                localStorage.setItem(pageSizeKey, String(pageSize));
+            } catch (error) {
+                console.error('Error al guardar pageSize en localStorage:', error);
+            }
+        }
+    }, [pageSize, pageSizeKey, enableClientPagination]);
 
     const table = useReactTable({
         data,
@@ -50,47 +80,81 @@ export function DataTable<TData, TValue>({
         state: {
             sorting,
             globalFilter,
+            pagination: {
+                pageIndex,
+                pageSize,
+            },
         },
         onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
+        onPaginationChange: (updater) => {
+            if (typeof updater === 'function') {
+                const newPagination = updater({ pageIndex, pageSize });
+                setPageIndex(newPagination.pageIndex);
+                setPageSize(newPagination.pageSize);
+            } else {
+                setPageIndex(updater.pageIndex);
+                setPageSize(updater.pageSize);
+            }
+        },
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: enableClientPagination ? getPaginationRowModel() : undefined,
         getSortedRowModel: enableClientSorting ? getSortedRowModel() : undefined,
         getFilteredRowModel: enableClientFiltering ? getFilteredRowModel() : undefined,
         globalFilterFn: (row: Row<TData>, _columnId: string, filterValue: string) => {
             if (!filterFields.length) return true;
-
-            return filterFields.some((field) => {
+            return filterFields.some(({ field }) => {
                 const value = row.getValue(field);
                 return String(value).toLowerCase().includes(filterValue.toLowerCase());
             });
         },
     });
 
+    React.useEffect(() => {
+        table.setPageSize(pageSize);
+    }, [pageSize, table]);
+
+    React.useEffect(() => {
+        setPageIndex(0);
+    }, [globalFilter]);
+
     const placeholder = React.useMemo(() => {
-        if (!filterFields.length) return __('common.placeholders.search', { field: '...' });
-
+        if (!filterFields.length) return 'Buscar...';
         if (filterFields.length === 1) {
-            return __('common.placeholders.search', {
-                field: __('common.fields.' + filterFields[0]),
-            });
+            return `Buscar por ${filterFields[0].label}...`;
         }
-
-        return __('common.placeholders.search_multiple', {
-            fields: filterFields.map((field) => __('common.fields.' + field)).join(', '),
-        });
-    }, [filterFields, __]);
+        return `Buscar por ${filterFields.map((f) => f.label).join(', ')}...`;
+    }, [filterFields]);
 
     return (
         <div className="space-y-4">
-            {enableClientFiltering && (
-                <div className="flex items-center">
-                    <Input
-                        placeholder={placeholder}
-                        value={globalFilter}
-                        onChange={(event) => setGlobalFilter(event.target.value)}
-                        className="max-w-sm"
-                    />
+            {(enableClientFiltering || enableClientPagination) && (
+                <div className="flex items-center justify-between gap-2">
+                    {enableClientFiltering && (
+                        <Input
+                            placeholder={placeholder}
+                            value={globalFilter}
+                            onChange={(event) => setGlobalFilter(event.target.value)}
+                            className="max-w-sm"
+                        />
+                    )}
+                    {enableClientPagination && (
+                        <div className="flex items-center gap-1">
+                            <span>Mostrar:</span>
+                            <Select value={String(pageSize)} onValueChange={(value) => setPageSize(Number(value))}>
+                                <SelectTrigger className="h-8 w-[70px]">
+                                    <SelectValue placeholder={pageSize} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {paginationOptions.map((size) => (
+                                        <SelectItem key={size} value={String(size)}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -112,7 +176,6 @@ export function DataTable<TData, TValue>({
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => {
                                 const rowLink = getRowLink?.(row.original);
-
                                 return (
                                     <TableRow
                                         key={row.id}
@@ -123,7 +186,6 @@ export function DataTable<TData, TValue>({
                                             <TableCell
                                                 key={cell.id}
                                                 onClick={(e) => {
-                                                    // Evita que los botones de acción activen el click del row
                                                     if (cell.column.id === 'actions') e.stopPropagation();
                                                 }}
                                             >
@@ -136,7 +198,7 @@ export function DataTable<TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {__('common.tables.no_data')}
+                                    No hay datos.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -146,19 +208,15 @@ export function DataTable<TData, TValue>({
 
             {enableClientPagination && (
                 <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                        {__('pagination.page_info', {
-                            current: table.getState().pagination.pageIndex + 1,
-                            total: table.getPageCount(),
-                        })}
-                    </div>
-
+                    <span className="text-sm text-muted-foreground">
+                        Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+                    </span>
                     <div className="space-x-2">
                         <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                            {__('pagination.previous')}
+                            Anterior
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                            {__('pagination.next')}
+                            Siguiente
                         </Button>
                     </div>
                 </div>
