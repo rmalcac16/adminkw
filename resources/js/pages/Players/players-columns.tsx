@@ -45,7 +45,7 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
 
                 return (
                     <span className={`relative inline-block text-sm font-medium`}>
-                        <span className="relative z-10">{language.label}</span>
+                        <span className="relative z-10 text-xs">{language.label}</span>
                         <span
                             className={`absolute bottom-0 left-0 h-[2px] w-full ${language.gradient} bg-[length:100%_2px] bg-no-repeat`}
                             aria-hidden="true"
@@ -65,7 +65,7 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
                 return (
                     <ContextMenu>
                         <ContextMenuTrigger>
-                            <Badge variant="secondary" className="line-clamp-1 max-w-[300px] truncate overflow-hidden">
+                            <Badge variant="secondary" className="line-clamp-1 max-w-[260px] truncate overflow-hidden">
                                 {urlCode}
                             </Badge>
                         </ContextMenuTrigger>
@@ -119,13 +119,13 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
         },
         {
             accessorKey: 'created_at',
-            header: 'Fecha de creación',
-            cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{formatDate(getValue<string>())}</span>,
+            header: 'Creación',
+            cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{formatDate(getValue<string>())}</span>,
         },
         {
             accessorKey: 'updated_at',
-            header: 'Fecha de actualización',
-            cell: ({ getValue }) => <span className="text-sm text-muted-foreground">{formatDate(getValue<string>())}</span>,
+            header: 'Actualización',
+            cell: ({ getValue }) => <span className="text-xs text-muted-foreground">{formatDate(getValue<string>())}</span>,
         },
         {
             id: 'actions',
