@@ -50,8 +50,11 @@ class PlayerService
 
     public function create(Anime $anime, Episode $episode, array $data): ?Player
     {
-        $data['created_at'] = '2021-01-01 00:00:00';
-        $player = $episode->players()->create($data);
+        $data['created_at'] = now();
+        $data['updated_at'] = '2021-01-01 00:00:00';
+        $player = $episode->players()->make($data);
+        $player->timestamps = false;
+        $player->save();
         $this->flushPlayerCache($anime, $episode);
         return $player;
     }
@@ -77,23 +80,16 @@ class PlayerService
 
     public function createOrUpdate(Anime $anime, Episode $episode, array $data): Player
     {
-        $player = Player::where('episode_id', $episode->id)
+        $player = $episode->players()
             ->where('server_id', $data['server_id'])
             ->where('languaje', $data['languaje'])
             ->first();
 
         if ($player) {
-            $player->update([
-                'code' => $data['code'],
-                'code_backup' => $data['code_backup'],
-            ]);
+            $player = $this->update($anime, $episode, $player, $data);
         } else {
-            $data['created_at'] = '2021-01-01 00:00:00';
-            $player = $episode->players()->create($data);
+            $player = $this->create($anime, $episode, $data);
         }
-
-        $this->flushPlayerCache($anime, $episode);
-
         return $player;
     }
 }
