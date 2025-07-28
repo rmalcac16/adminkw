@@ -28,9 +28,9 @@ export function getAnimeColumns(): ColumnDef<AnimeData>[] {
                 const nameAlternative = row.original.name_alternative;
 
                 return (
-                    <div className="max-w-[330px] space-y-0.5">
-                        <div className="max-w-[330px] text-sm font-medium">{shortenText(name)}</div>
-                        <div className="line-clamp-1 max-w-[330px] text-xs overflow-ellipsis text-muted-foreground">
+                    <div className="space-y-0.5">
+                        <div className="line-clamp-1 max-w-[280px] text-sm font-medium overflow-ellipsis">{shortenText(name)}</div>
+                        <div className="line-clamp-1 max-w-[280px] text-xs overflow-ellipsis text-muted-foreground">
                             {nameAlternative ? shortenText(nameAlternative) : '--'}
                         </div>
                     </div>
@@ -45,7 +45,7 @@ export function getAnimeColumns(): ColumnDef<AnimeData>[] {
                     <ContextMenuTrigger>
                         <Badge variant={'secondary'}>{getValue<string>() || '--'}</Badge>
                     </ContextMenuTrigger>
-                    <ContextMenuContent className="w-64">
+                    <ContextMenuContent>
                         <ContextMenuItem
                             inset
                             onClick={(e) => {
@@ -64,7 +64,7 @@ export function getAnimeColumns(): ColumnDef<AnimeData>[] {
             accessorKey: 'slug',
             header: 'Slug',
             cell: ({ getValue }) => (
-                <Badge variant={'secondary'} className="line-clamp-1 max-w-[250px] overflow-ellipsis">
+                <Badge variant={'secondary'} className="line-clamp-1 max-w-[220px] overflow-ellipsis">
                     {shortenText(getValue<string>())}
                 </Badge>
             ),
