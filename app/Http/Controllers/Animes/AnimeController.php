@@ -25,7 +25,7 @@ class AnimeController extends Controller
 
     public function index(Request $request, AnimeService $animeService)
     {
-        $filters = $request->only(['search', 'perPage']);
+        $filters = $request->only(['search', 'perPage', 'status', 'type']);
         $perPage = (int) ($filters['perPage'] ?? 10);
 
         return inertia('Animes/Index', [

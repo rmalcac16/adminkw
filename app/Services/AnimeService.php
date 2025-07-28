@@ -11,21 +11,34 @@ class AnimeService
 {
     public function getAll(): Collection
     {
-        return Anime::select(['id', 'name', 'name_alternative',  'slug', 'status', 'aired'])
+        return Anime::select(['id', 'name', 'name_alternative', 'short_name', 'slug', 'status', 'aired'])
             ->orderByDesc('id')
             ->get();
     }
 
     public function paginate(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        $query = Anime::query()->select(['id', 'name', 'name_alternative', 'slug', 'status', 'aired']);
+        $query = Anime::query()->select(['id', 'name', 'name_alternative', 'short_name', 'slug', 'status', 'type', 'aired']);
 
-        if (!empty($filters['search'])) {
+        // Filtro de búsqueda
+        if (!empty($filters['search'] ?? null)) {
             $search = trim($filters['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('name_alternative', 'like', "%{$search}%");
             });
+        }
+
+        // Filtro de estado
+        $status = $filters['status'] ?? null;
+        if (!empty($status) && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // Filtro de tipo (case-insensitive)
+        $type = $filters['type'] ?? null;
+        if (!empty($type) && $type !== 'all') {
+            $query->whereRaw('LOWER(type) = ?', [strtolower($type)]);
         }
 
         return $query->orderByDesc('id')->paginate($perPage)->appends($filters);

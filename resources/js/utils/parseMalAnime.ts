@@ -1,11 +1,18 @@
 import { GenreData } from '@/types/genre';
 
 export function parseMalAnime(mal: any, allGenres: GenreData[]) {
+    // ----------------------------
+    // Títulos principales y alternativos
+    // ----------------------------
     const title = mal.title || '';
     const alternatives = [...(mal.alternative_titles?.synonyms || []), mal.alternative_titles?.en, mal.alternative_titles?.ja]
         .filter(Boolean)
         .join(',');
 
+    // ----------------------------
+    // Estado del anime
+    // ----------------------------
+    // 1 = en emisión, 0 = finalizado, 3 = no emitido aún
     let status = '1';
     if (mal.status === 'finished_airing') {
         status = '0';
@@ -13,11 +20,17 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
         status = '3';
     }
 
+    // ----------------------------
+    // Fechas y estadísticas
+    // ----------------------------
     const aired = mal.start_date || '';
     const vote_average = mal.mean || 0;
     const popularity = mal.popularity || 0;
     const rating = mal.rating || 'pg';
 
+    // ----------------------------
+    // Tipos de medios (MAP de MyAnimeList → estándar interno)
+    // ----------------------------
     const mediaTypeMap: Record<string, string> = {
         tv: 'TV',
         movie: 'Movie',
@@ -30,6 +43,9 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
 
     const type = mediaTypeMap[mal.media_type?.toLowerCase()] || 'TV';
 
+    // ----------------------------
+    // Géneros: buscar coincidencias entre MAL y los locales
+    // ----------------------------
     const genresMatched = Array.isArray(mal.genres)
         ? mal.genres
               .map((g: any) => {
@@ -40,6 +56,9 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
               .filter(Boolean)
         : [];
 
+    // ----------------------------
+    // Mapeo de días a números (1 = Lunes ... 7 = Domingo)
+    // ----------------------------
     const dayMap: Record<string, number> = {
         monday: 1,
         tuesday: 2,
@@ -50,7 +69,10 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
         sunday: 7,
     };
 
-    let broadcast: number | null = null;
+    // ----------------------------
+    // Calcular día de emisión ajustado a zona local
+    // ----------------------------
+    let broadcast: string | null = null;
 
     if (mal.broadcast?.day_of_the_week && mal.broadcast?.start_time) {
         const day = mal.broadcast.day_of_the_week.toLowerCase();
@@ -62,14 +84,18 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
 
         let localDay = originalDayNumber;
 
+        // Ajustar día si el estreno ocurre antes de las 14:00 (conversión de zona horaria)
         if (hour < 14) {
             localDay -= 1;
-            if (localDay < 1) localDay = 7;
+            if (localDay < 1) localDay = 7; // si pasa a 0, retrocede al domingo
         }
 
-        broadcast = localDay;
+        broadcast = String(localDay); // convertir a string
     }
 
+    // ----------------------------
+    // Temporada de estreno (ej. "Spring 2023")
+    // ----------------------------
     let premiered: string | null = null;
     if (mal.start_season?.year && mal.start_season?.season) {
         const season = mal.start_season.season;
@@ -77,6 +103,9 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
         premiered = `${capitalizedSeason} ${mal.start_season.year}`;
     }
 
+    // ----------------------------
+    // Retorno de datos normalizados
+    // ----------------------------
     return {
         name: title,
         name_alternative: alternatives,
@@ -87,8 +116,8 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
         popularity,
         type,
         mal_id: mal.id,
-        genres: genresMatched.join(','),
-        broadcast,
-        premiered,
+        genres: genresMatched.join(','), // géneros separados por coma
+        broadcast, // string "1–7" o null
+        premiered, // ej. "Spring 2023"
     };
 }
