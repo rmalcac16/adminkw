@@ -2,6 +2,7 @@ export interface AnimeData {
     id: number;
     name: string;
     name_alternative: string | null;
+    name_en: string | null;
     slug: string;
     banner: string | null;
     poster: string | null;

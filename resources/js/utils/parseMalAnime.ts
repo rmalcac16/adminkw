@@ -9,6 +9,8 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
         .filter(Boolean)
         .join(',');
 
+    const englishTitle = mal.alternative_titles?.en || '';
+
     // ----------------------------
     // Estado del anime
     // ----------------------------
@@ -108,6 +110,7 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
     // ----------------------------
     return {
         name: title,
+        name_en: englishTitle,
         name_alternative: alternatives,
         status,
         aired,

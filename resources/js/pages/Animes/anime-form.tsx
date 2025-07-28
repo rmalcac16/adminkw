@@ -7,13 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useLang } from '@/hooks/useLang';
 import { AnimeData } from '@/types/anime';
 import { GenreData } from '@/types/genre';
 import { useForm } from '@inertiajs/react';
 import { Edit3, Plus } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { toast } from 'sonner';
 import { AnimeDialogSyncMal } from './anime-dialog-sync-mal';
 
@@ -24,6 +25,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
 
     const { data, setData, errors, post, put, processing, reset } = useForm({
         name: anime?.name || '',
+        name_en: anime?.name_en || '',
         name_alternative: anime?.name_alternative || '',
         slug: anime?.slug || '',
         banner: anime?.banner || '',
@@ -43,6 +45,35 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
         overview: anime?.overview || '',
         short_name: anime?.short_name || '',
     });
+
+    const [originalName, setOriginalName] = useState(anime?.name || '');
+    const [useEnglishTitle, setUseEnglishTitle] = useState(false);
+
+    const handleSwitchChange = (checked: boolean) => {
+        setUseEnglishTitle(checked);
+
+        const alternativesSet = new Set(
+            (data.name_alternative || '')
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean),
+        );
+
+        if (checked) {
+            setOriginalName(data.name);
+            alternativesSet.add(data.name);
+            alternativesSet.delete(data.name_en);
+            setData('name', data.name_en || data.name);
+            setData('name_alternative', Array.from(alternativesSet).join(','));
+        } else {
+            setData('name', originalName);
+            const updatedAlternatives = Array.from(alternativesSet).filter((alt) => alt !== originalName);
+            if (data.name_en && !updatedAlternatives.includes(data.name_en)) {
+                updatedAlternatives.push(data.name_en);
+            }
+            setData('name_alternative', updatedAlternatives.join(','));
+        }
+    };
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
@@ -94,6 +125,12 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                         required
                     />
                     <InputError message={errors.name} className="text-xs" />
+                    <div className="flex items-center gap-2 lg:col-span-12">
+                        <Switch checked={useEnglishTitle} onCheckedChange={handleSwitchChange} id="useEnglish" />
+                        <Label htmlFor="useEnglish" className="text-sm">
+                            Alternar títulos original/ingles
+                        </Label>
+                    </div>
                 </div>
                 <div className="flex flex-col gap-2 lg:col-span-5">
                     <Label htmlFor="slug">{__('animes.labels.slug')}</Label>
