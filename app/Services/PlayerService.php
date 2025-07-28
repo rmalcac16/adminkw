@@ -7,6 +7,8 @@ use App\Models\Episode;
 use App\Models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PlayerService
 {
@@ -59,7 +61,6 @@ class PlayerService
         return $player;
     }
 
-
     public function update(Anime $anime, Episode $episode, Player $player, array $data): ?Player
     {
         $player->update($data);
@@ -91,5 +92,42 @@ class PlayerService
             $player = $this->create($anime, $episode, $data);
         }
         return $player;
+    }
+
+    /**
+     * Crear o actualizar múltiples players.
+     *
+     * @param Anime   $anime
+     * @param Episode $episode
+     * @param array   $data
+     * @return array|null
+     */
+    public function createMultiple(Anime $anime, Episode $episode, array $data): ?array
+    {
+        if (empty($data['players']) || !is_array($data['players'])) {
+            return null;
+        }
+
+        $created = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($data['players'] as $playerData) {
+                if (empty($playerData['code'])) {
+                    continue;
+                }
+                $created[] = $this->createOrUpdate($anime, $episode, $playerData);
+            }
+
+            DB::commit();
+
+            $this->flushPlayerCache($anime, $episode);
+
+            return $created;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return null;
+        }
     }
 }

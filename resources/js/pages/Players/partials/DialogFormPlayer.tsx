@@ -28,8 +28,8 @@ export function DialogFormPlayer({
     servers: ServerData[];
 }) {
     const isEdit = !!player;
-
     const [isValidDomain, setIsValidDomain] = useState(false);
+    const [serverManuallySelected, setServerManuallySelected] = useState(false);
 
     const form = useForm({
         code: player?.code_backup || '',
@@ -43,37 +43,38 @@ export function DialogFormPlayer({
         const selectedServer = servers.find((s) => s.id === Number(form.data.server_id));
         const isValid = selectedServer?.domains?.some((domain) => form.data.code.includes(domain)) ?? false;
         setIsValidDomain(isValid);
-    }, [form.data.code, form.data.server_id]);
+    }, [form.data.code, form.data.server_id, servers]);
 
     useEffect(() => {
+        if (serverManuallySelected) return;
         const matchedServer = servers.find((server) =>
             [...(server.domains || [])].sort((a, b) => b.length - a.length).some((domain) => form.data.code.includes(domain)),
         );
-
         const isValid = !!matchedServer;
         setIsValidDomain(isValid);
-
         if (isValid && matchedServer?.id !== form.data.server_id) {
             form.setData('server_id', matchedServer.id);
         }
-    }, [form.data.code]);
+    }, [form.data.code, form.data.server_id, servers, serverManuallySelected]);
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
-
         form.post(
             isEdit
                 ? route('players.update', { anime: animeId, episode: episodeId, player: player?.id })
                 : route('players.store', { anime: animeId, episode: episodeId }),
             {
-                onSuccess: () => {
-                    setOpen(false);
-                },
+                onSuccess: () => setOpen(false),
             },
         );
     };
 
-    const isUnchanged = isEdit && player && form.data.code === player.code_backup;
+    const isUnchanged =
+        isEdit &&
+        player &&
+        form.data.code === player.code_backup &&
+        form.data.languaje === player.languaje &&
+        form.data.server_id === player.server_id;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -87,9 +88,15 @@ export function DialogFormPlayer({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="grid gap-2">
                             <Label htmlFor="server_id">Servidor</Label>
-                            <Select value={String(form.data.server_id)} onValueChange={(value) => form.setData('server_id', parseInt(value))}>
+                            <Select
+                                value={String(form.data.server_id)}
+                                onValueChange={(value) => {
+                                    setServerManuallySelected(true);
+                                    form.setData('server_id', parseInt(value));
+                                }}
+                            >
                                 <SelectTrigger>
-                                    <SelectValue placeholder={'Selecciona un servidor'} />
+                                    <SelectValue placeholder="Selecciona un servidor" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {servers.map((server) => (
@@ -106,7 +113,7 @@ export function DialogFormPlayer({
                             <Label htmlFor="languaje">Idioma</Label>
                             <Select value={String(form.data.languaje)} onValueChange={(value) => form.setData('languaje', parseInt(value))}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder={'Selecciona un idioma'} />
+                                    <SelectValue placeholder="Selecciona un idioma" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {languages.map((lang) => (
@@ -121,7 +128,7 @@ export function DialogFormPlayer({
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="server_id">Dominios</Label>
+                        <Label>Dominios</Label>
                         {(() => {
                             const selectedServer = servers.find((s) => s.id === Number(form.data.server_id));
                             const matchedDomain = [...(selectedServer?.domains || [])]
@@ -130,7 +137,7 @@ export function DialogFormPlayer({
                             return selectedServer?.domains?.length ? (
                                 <div className="flex flex-wrap items-center gap-2">
                                     {selectedServer.domains.map((domain) => (
-                                        <Badge variant={domain === matchedDomain ? 'secondary' : 'secondary'} key={domain}>
+                                        <Badge variant="secondary" key={domain}>
                                             {domain}
                                             {domain === matchedDomain && <IconCircleCheck className="text-green-500" />}
                                         </Badge>
@@ -145,7 +152,7 @@ export function DialogFormPlayer({
                         <Input
                             value={form.data.code}
                             onChange={(e) => form.setData('code', e.target.value)}
-                            placeholder={'Ingresa un enlace'}
+                            placeholder="Ingresa un enlace"
                             required
                             autoFocus
                         />

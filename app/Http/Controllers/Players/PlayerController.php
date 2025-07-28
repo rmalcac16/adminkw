@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Players;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Players\StoreMultiplePlayersRequest;
 use App\Http\Requests\Players\StorePlayerRequest;
 use App\Http\Requests\Players\UpdatePlayerRequest;
 use App\Models\Anime;
@@ -72,5 +73,16 @@ class PlayerController extends Controller
             return redirect()->back()->with('success', __('players.destroy.success'));
         }
         return redirect()->back()->withErrors(__('players.destroy.error'));
+    }
+
+
+    public function createMultiple(StoreMultiplePlayersRequest $request, Anime $anime, Episode $episode)
+    {
+        $data = $request->validated();
+        $createdPlayers = $this->playerService->createMultiple($anime, $episode, $data);
+        if ($createdPlayers) {
+            return redirect()->back()->with('success', "Se han creado " . count($createdPlayers) . " reproductores exitosamente.");
+        }
+        return redirect()->back()->withErrors("Error al crear los reproductores.");
     }
 }

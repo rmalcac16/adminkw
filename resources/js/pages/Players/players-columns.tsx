@@ -70,6 +70,9 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
                             </Badge>
                         </ContextMenuTrigger>
                         <ContextMenuContent className="w-64">
+                            <ContextMenuItem inset onClick={() => window.open(urlCode, '_blank')}>
+                                Abrir en una nueva pestaña
+                            </ContextMenuItem>
                             <ContextMenuItem
                                 inset
                                 onClick={() => {
@@ -78,9 +81,6 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
                                 }}
                             >
                                 Copiar enlace
-                            </ContextMenuItem>
-                            <ContextMenuItem inset onClick={() => window.open(urlCode, '_blank')}>
-                                Abrir en una nueva pestaña
                             </ContextMenuItem>
                         </ContextMenuContent>
                     </ContextMenu>
@@ -100,6 +100,9 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
                             </Badge>
                         </ContextMenuTrigger>
                         <ContextMenuContent className="w-64">
+                            <ContextMenuItem inset onClick={() => window.open(urlCode, '_blank')}>
+                                Abrir en una nueva pestaña
+                            </ContextMenuItem>
                             <ContextMenuItem
                                 inset
                                 onClick={() => {
@@ -108,9 +111,6 @@ export function getPlayerColumns(): ColumnDef<PlayerData>[] {
                                 }}
                             >
                                 Copiar enlace
-                            </ContextMenuItem>
-                            <ContextMenuItem inset onClick={() => window.open(urlCode, '_blank')}>
-                                Abrir en una nueva pestaña
                             </ContextMenuItem>
                         </ContextMenuContent>
                     </ContextMenu>

@@ -5,7 +5,6 @@ namespace App\Http\Requests\Players;
 use App\Models\Server;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use InvalidArgumentException;
 
 class StorePlayerRequest extends FormRequest
 {
@@ -20,33 +19,16 @@ class StorePlayerRequest extends FormRequest
             $server = Server::find($this->input('server_id'));
 
             if ($server && is_array($server->domains)) {
-                $original = $this->input('code');
-                $cleaned = $this->extractId($original);
+                $data = extractVideoData($this->input('code'));
 
-                $this->merge([
-                    'code' => $cleaned,
-                    'code_backup' => $original,
-                ]);
+                if ($data) {
+                    $this->merge([
+                        'code' => $data['id'],
+                        'code_backup' => $data['backupUrl'],
+                    ]);
+                }
             }
         }
-    }
-
-    protected function extractId(string $url): string
-    {
-        $path = parse_url($url, PHP_URL_PATH);
-        $path = trim(preg_replace('/\s+/', '/', $path), '/');
-
-        $segments = array_values(array_filter(explode('/', $path)));
-
-        if (count($segments) === 1) {
-            return $segments[0];
-        }
-
-        if (count($segments) >= 2) {
-            return $segments[1];
-        }
-
-        throw new InvalidArgumentException('URL inválida: no se pudo extraer el ID.');
     }
 
     public function rules(): array
@@ -55,13 +37,13 @@ class StorePlayerRequest extends FormRequest
             'code' => [
                 'required',
                 'string',
-                'max:512',
+                'max:50',
                 Rule::unique('players')->where(
                     fn($query) =>
                     $query->where('server_id', $this->server_id)
                 ),
             ],
-            'code_backup' => ['nullable', 'string', 'max:1024'],
+            'code_backup' => ['nullable', 'string', 'max:150'],
             'server_id' => ['required', 'exists:servers,id'],
             'episode_id' => ['required', 'exists:episodes,id'],
             'languaje' => ['required', 'integer'],
@@ -71,13 +53,22 @@ class StorePlayerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'code.unique' => __('players.validation.code.unique'),
-            'server_id.required' => __('players.validation.server_id.required'),
-            'server_id.exists' => __('players.validation.server_id.exists'),
-            'episode_id.required' => __('players.validation.episode_id.required'),
-            'episode_id.exists' => __('players.validation.episode_id.exists'),
-            'languaje.required' => __('players.validation.languaje.required'),
-            'languaje.integer' => __('players.validation.languaje.integer'),
+            'code.required'   => 'El campo código es obligatorio.',
+            'code.string'     => 'El código debe ser una cadena de texto válida.',
+            'code.max'        => 'El código no puede tener más de 50 caracteres.',
+            'code.unique'     => 'Este código ya está registrado para el servidor seleccionado.',
+
+            'code_backup.string' => 'El código de respaldo debe ser una cadena de texto válida.',
+            'code_backup.max'    => 'El código de respaldo no puede tener más de 150 caracteres.',
+
+            'server_id.required' => 'Debe seleccionar un servidor.',
+            'server_id.exists'   => 'El servidor seleccionado no existe en el sistema.',
+
+            'episode_id.required' => 'Debe seleccionar un episodio.',
+            'episode_id.exists'   => 'El episodio seleccionado no existe en el sistema.',
+
+            'languaje.required' => 'Debe especificar un idioma.',
+            'languaje.integer'  => 'El idioma debe ser un valor numérico válido.',
         ];
     }
 }

@@ -28,7 +28,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('animes/{anime}/episodes/upload', [EpisodeController::class, 'upload'])->name('episodes.upload');
     Route::post('animes/{anime}/episodes/generate-players', [EpisodeController::class, 'generatePlayers'])->name('episodes.generate-players');
+
     Route::resource('animes.episodes', EpisodeController::class)->names('episodes')->only(['index', 'store', 'update', 'destroy']);
+
+
+    Route::post('animes/{anime}/episodes/{episode}/players/create-multiple', [PlayerController::class, 'createMultiple'])->name('players.create-multiple');
     Route::resource('animes.episodes.players', PlayerController::class)->names('players')->only(['index', 'store', 'update', 'destroy']);
 
     Route::put('users/{user}/toggle-premium', [UserController::class, 'togglePremium'])->name('users.toggle-premium');
@@ -43,7 +47,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/cache/animes/{anime}/episodes/clear', [CacheController::class, 'clearEpisodeCache'])
         ->name('cache.episodes.clear');
     Route::post('/cache/animes/{anime}/episodes/{episode}/players/clear', [CacheController::class, 'clearPlayerCache'])->name('cache.players.clear');
-
 
     Route::get('upload/servers', [UploadController::class, 'getServers'])->name('upload.servers');
 });

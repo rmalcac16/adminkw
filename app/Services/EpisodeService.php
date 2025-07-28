@@ -140,8 +140,6 @@ class EpisodeService
 
         // $this->flushCache($anime);
 
-
-
         // if ($responseUpload['status'] === 'ok') {
         //     $this->playerService->createOrUpdate($anime, $episode, [
         //         'server_id' => $data['server_id'],

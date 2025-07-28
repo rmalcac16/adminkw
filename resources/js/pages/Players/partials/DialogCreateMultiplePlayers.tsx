@@ -1,31 +1,23 @@
+import { useForm } from '@inertiajs/react';
+import { PlusCircle, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
+
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { languages } from '@/data/langs';
-import { PlayerData } from '@/types/player';
 import { ServerData } from '@/types/server';
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
 
-function normalizeEmbedUrl(originalUrl: string, embedDomain: string): string {
-    try {
-        const url = new URL(originalUrl.trim());
-        const segments = url.pathname.split('/').filter(Boolean);
-        const index = segments.findIndex((seg) => ['e', 'd', 's'].includes(seg.toLowerCase()));
-        if (index !== -1 && segments.length > index + 1) {
-            const videoId = segments[index + 1];
-            const cleanDomain = embedDomain.replace(/\/$/, '');
-            return `${cleanDomain}/e/${videoId}`;
-        }
-        return originalUrl;
-    } catch (error) {
-        return originalUrl;
-    }
+interface PlayerData {
+    server_id: number;
+    code: string;
+    languaje: number;
+    episode_id: number;
+    [key: string]: number | string;
 }
 
 export function DialogCreateMultiplePlayers({
@@ -37,150 +29,227 @@ export function DialogCreateMultiplePlayers({
 }: {
     animeId: number;
     episodeId: number;
-    player?: PlayerData | null;
     open: boolean;
     setOpen: (open: boolean) => void;
     servers: ServerData[];
 }) {
-    const form = useForm({
-        code: '',
-        languaje: 0,
-        episode_id: episodeId,
+    const [selectedLanguages, setSelectedLanguages] = useState<{ value: number; label: string }[]>([]);
+    const form = useForm<{ players: PlayerData[] }>({
+        players: [],
     });
 
-    const [players, setPlayers] = useState<
-        {
-            link: string;
-            original: string;
-            languaje: number;
-            server: ServerData;
-            thumbnail?: string;
-        }[]
-    >([]);
+    // Reset state when dialog opens
+    useEffect(() => {
+        if (open) {
+            const subtituladoDefault = languages.find((lang) => Number(lang.value) === 0);
+            if (subtituladoDefault && servers.length > 0) {
+                const defaultLanguages = [{ value: Number(subtituladoDefault.value), label: subtituladoDefault.label }];
+                const defaultPlayers = servers.map((server) => ({
+                    server_id: server.id,
+                    code: '',
+                    languaje: Number(subtituladoDefault.value),
+                    episode_id: episodeId,
+                }));
+                setSelectedLanguages(defaultLanguages);
+                form.setData('players', defaultPlayers);
+                form.clearErrors();
+            } else {
+                setSelectedLanguages([]);
+                form.setData('players', []);
+                form.clearErrors();
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, episodeId, servers]);
+
+    const handleOpenChange = (isOpen: boolean) => {
+        setOpen(isOpen);
+    };
+
+    const ServerPlayerInput = ({ server, player }: { server: ServerData; player: PlayerData }) => {
+        const playerIndex = form.data.players.findIndex((p) => p.server_id === player.server_id && p.languaje === player.languaje);
+        const error = form.errors && (form.errors as any)[`players.${playerIndex}.code`];
+
+        return (
+            <div className="relative rounded-md border p-3 shadow-sm">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6"
+                    onClick={() => removeServerFromGroup(server.id, player.languaje)}
+                    aria-label={`Quitar ${server.title}`}
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+                <Label htmlFor={`server-${server.id}-${player.languaje}`} className="mb-2 block text-center text-sm font-medium">
+                    {server.title}
+                </Label>
+                <Input
+                    id={`server-${server.id}-${player.languaje}`}
+                    value={player.code}
+                    onChange={(e) => updatePlayerCode(server.id, player.languaje, e.target.value)}
+                    placeholder={`Enlace para ${server.title}`}
+                    className="h-9 text-sm"
+                />
+                {error && <InputError message={error} className="mt-1 text-xs" />}
+            </div>
+        );
+    };
+
+    const LanguagePlayerGroup = ({ language }: { language: { value: number; label: string } }) => {
+        const playersInGroup = form.data.players.filter((p) => p.languaje === language.value);
+        const displayedServerIds = playersInGroup.map((p) => p.server_id);
+        const availableServersToAdd = servers.filter((s) => !displayedServerIds.includes(s.id));
+
+        return (
+            <div className="space-y-4 rounded-lg border bg-secondary/30 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="text-lg font-semibold">{`Idioma: ${language.label}`}</h3>
+                    <div className="flex items-center gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button type="button" variant="outline" size="sm" disabled={availableServersToAdd.length === 0}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servidor
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {availableServersToAdd.length > 0 ? (
+                                    availableServersToAdd.map((server) => (
+                                        <DropdownMenuItem key={server.id} onSelect={() => addServerToGroup(server, language.value)}>
+                                            {server.title}
+                                        </DropdownMenuItem>
+                                    ))
+                                ) : (
+                                    <DropdownMenuItem disabled>Todos los servidores añadidos</DropdownMenuItem>
+                                )}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeLanguageGroup(language.value)}
+                            aria-label="Eliminar grupo de idioma"
+                        >
+                            <X className="h-5 w-5" />
+                        </Button>
+                    </div>
+                </div>
+                {playersInGroup.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                        {playersInGroup.map((player) => {
+                            const server = servers.find((s) => s.id === player.server_id);
+                            return server ? <ServerPlayerInput key={server.id} server={server} player={player} /> : null;
+                        })}
+                    </div>
+                ) : (
+                    <div className="py-4 text-center text-sm text-muted-foreground">Añade servidores a este grupo.</div>
+                )}
+            </div>
+        );
+    };
+
+    const addLanguageGroup = (language: { value: number; label: string }) => {
+        setSelectedLanguages((prev) => [...prev, language]);
+        // Add all servers for this language
+        const newPlayers = servers.map((server) => ({
+            server_id: server.id,
+            code: '',
+            languaje: language.value,
+            episode_id: episodeId,
+        }));
+        form.setData('players', [...form.data.players, ...newPlayers]);
+    };
+
+    const removeLanguageGroup = (languageValue: number) => {
+        setSelectedLanguages((prev) => prev.filter((lang) => lang.value !== languageValue));
+        form.setData(
+            'players',
+            form.data.players.filter((p) => p.languaje !== languageValue),
+        );
+    };
+
+    const addServerToGroup = (server: ServerData, languageValue: number) => {
+        form.setData('players', [
+            ...form.data.players,
+            {
+                server_id: server.id,
+                code: '',
+                languaje: languageValue,
+                episode_id: episodeId,
+            },
+        ]);
+    };
+
+    const removeServerFromGroup = (serverId: number, languageValue: number) => {
+        form.setData(
+            'players',
+            form.data.players.filter((p) => !(p.server_id === serverId && p.languaje === languageValue)),
+        );
+    };
+
+    const updatePlayerCode = (serverId: number, languageValue: number, newCode: string) => {
+        form.setData(
+            'players',
+            form.data.players.map((p) => (p.server_id === serverId && p.languaje === languageValue ? { ...p, code: newCode } : p)),
+        );
+    };
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
-        if (players.length === 0) return;
+        const validPlayers = form.data.players.filter((p) => p.code.trim() !== '');
+        if (validPlayers.length === 0) return;
 
-        form.post(route('players.storeMultiple', { animeId, episodeId }), {
-            onSuccess: () => {
-                setOpen(false);
-                form.reset();
-                setPlayers([]);
-            },
+        form.setData('players', validPlayers);
+        form.post(route('players.create-multiple', { anime: animeId, episode: episodeId }), {
+            onSuccess: () => setOpen(false),
+            preserveState: true,
         });
     };
 
-    const handleAddPlayers = () => {
-        const inputLink = form.data.code.trim();
-        if (!inputLink) return;
-
-        // Detectar todos los servidores compatibles
-        const compatibleServers = servers.filter((server) => (server.domains || []).some((domain) => inputLink.includes(domain)));
-
-        if (compatibleServers.length === 0) return;
-
-        const newEntries = compatibleServers.map((server) => {
-            const embedLink = normalizeEmbedUrl(inputLink, server.embed ?? '');
-            return {
-                link: embedLink,
-                original: inputLink,
-                languaje: form.data.languaje,
-                server,
-                thumbnail: `https://image.thum.io/get/width/400/crop/600/noanimate/${encodeURIComponent(embedLink)}`,
-            };
-        });
-
-        // Evitar duplicados por `link` + `server`
-        setPlayers((prev) => {
-            const existing = new Set(prev.map((p) => `${p.link}-${p.server.id}`));
-            const filtered = newEntries.filter((entry) => !existing.has(`${entry.link}-${entry.server.id}`));
-            return [...prev, ...filtered];
-        });
-
-        form.setData('code', '');
-    };
+    const availableLanguages = languages.filter((lang) => !selectedLanguages.some((selected) => selected.value === Number(lang.value)));
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="min-w-5xl">
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent className="max-h-[90vh] w-full overflow-y-auto lg:max-w-7xl">
                 <DialogHeader>
-                    <DialogTitle>Crear múltiples reproductores</DialogTitle>
-                    <DialogDescription>Agrega varios enlaces con su idioma correspondiente para todos los servidores compatibles.</DialogDescription>
+                    <DialogTitle>Crear Reproductores por Lotes</DialogTitle>
+                    <DialogDescription>Añade o quita idiomas y servidores según necesites. Los campos vacíos se ignorarán.</DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
-                        <div className="grid gap-2">
-                            <Label htmlFor="code">Enlace</Label>
-                            <Input value={form.data.code} onChange={(e) => form.setData('code', e.target.value)} placeholder="Ingresa un enlace" />
-                            <InputError message={form.errors.code} className="text-xs" />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="languaje">Idioma</Label>
-                            <Select value={String(form.data.languaje)} onValueChange={(value) => form.setData('languaje', parseInt(value))}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecciona un idioma" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {languages.map((lang) => (
-                                        <SelectItem key={lang.value} value={String(lang.value)}>
-                                            {lang.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div>
-                            <Button type="button" onClick={handleAddPlayers}>
-                                Agregar
-                            </Button>
-                        </div>
+                <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+                    <div className="space-y-6">
+                        {selectedLanguages.map((lang) => (
+                            <LanguagePlayerGroup key={lang.value} language={lang} />
+                        ))}
                     </div>
 
-                    {players.length > 0 && (
-                        <div className="flex flex-wrap gap-4">
-                            {players.map((player, index) => (
-                                <Card key={index} className="flex w-64 flex-col justify-between p-2">
-                                    <div className="aspect-video w-full overflow-hidden rounded border bg-black">
-                                        <iframe src={player.link} className="h-full w-full" frameBorder="0" allowFullScreen />
-                                    </div>
-
-                                    <CardContent className="mt-2 p-2 text-xs break-all text-muted-foreground">
-                                        <div className="font-semibold text-black">{player.server?.title}</div>
-                                        <div className="text-sm capitalize">
-                                            Idioma: {languages.find((l) => Number(l.value) === Number(player.languaje))?.label}
-                                        </div>
-                                        <div className="text-xs text-blue-600">
-                                            Embed: {player.link.length > 42 ? `${player.link.slice(0, 42)}...` : player.link}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            Original: {player.original.length > 42 ? `${player.original.slice(0, 42)}...` : player.original}
-                                        </div>
-                                    </CardContent>
-
-                                    <CardFooter className="flex justify-between gap-2 p-2">
-                                        <Button type="button" variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(player.link)}>
-                                            Copiar
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => setPlayers((prev) => prev.filter((_, i) => i !== index))}
-                                        >
-                                            Eliminar
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </div>
+                    {availableLanguages.length > 0 && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button type="button" variant="outline" className="w-full">
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Añadir Grupo de Idioma
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {availableLanguages.map((lang) => (
+                                    <DropdownMenuItem
+                                        key={lang.value}
+                                        onSelect={() => addLanguageGroup({ value: Number(lang.value), label: lang.label })}
+                                    >
+                                        {lang.label}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     )}
 
                     <DialogFooter>
-                        <Button type="submit" disabled={form.processing || players.length === 0}>
+                        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button type="submit" disabled={form.processing || form.data.players.filter((p) => p.code.trim()).length === 0}>
                             {form.processing ? 'Guardando...' : 'Crear Reproductores'}
                         </Button>
                     </DialogFooter>
