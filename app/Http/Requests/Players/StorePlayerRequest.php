@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Players;
 
 use App\Models\Server;
+use App\Services\VideoService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class StorePlayerRequest extends FormRequest
             $server = Server::find($this->input('server_id'));
 
             if ($server && is_array($server->domains)) {
-                $data = extractVideoData($this->input('code'));
+                $data = VideoService::extractVideoData($this->input('code'));
 
                 if ($data) {
                     $this->merge([

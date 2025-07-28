@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Players;
 
 use App\Models\Server;
+use App\Services\VideoService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -24,7 +25,7 @@ class StoreMultiplePlayersRequest extends FormRequest
                     $server = Server::find($player['server_id']);
 
                     if ($server && is_array($server->domains)) {
-                        $data = extractVideoData($player['code']);
+                        $data = VideoService::extractVideoData($player['code']);
 
                         if ($data) {
                             $player['code'] = $data['id'];

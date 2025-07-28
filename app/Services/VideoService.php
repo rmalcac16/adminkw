@@ -1,14 +1,16 @@
 <?php
 
+namespace App\Services;
 
-if (!function_exists('extractVideoData')) {
+class VideoService
+{
     /**
      * Extrae el ID del video y genera un backup URL estándar con /e/{id}.
      *
      * @param string|null $url
      * @return array|null
      */
-    function extractVideoData(?string $url): ?array
+    public static function extractVideoData(?string $url): ?array
     {
         if (empty($url)) {
             return null;
