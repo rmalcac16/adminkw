@@ -14,108 +14,108 @@ class StoreAnimeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'name_alternative' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255',
-            'banner' => 'nullable|string|max:255',
-            'poster' => 'nullable|string|max:255',
+            'name' => 'required|string|max:220',
+            'name_alternative' => 'nullable|string|max:350',
+            'slug' => 'nullable|string|max:220',
+            'banner' => 'nullable|string|max:220',
+            'poster' => 'nullable|string|max:220',
             'overview' => 'nullable|string',
             'aired' => 'nullable|date',
             'type' => 'nullable|string|in:TV,Movie,OVA,ONA,Special',
             'status' => 'nullable|integer|in:0,1,2,3,4',
-            'premiered' => 'nullable|string|max:255',
+            'premiered' => 'nullable|string|max:15',
             'broadcast' => 'nullable|string|size:1',
             'genres' => 'nullable|string|max:255',
-            'rating' => 'nullable|string|max:50',
+            'rating' => 'nullable|string|max:150',
             'popularity' => 'nullable|integer|min:0',
             'trailer' => 'nullable|url|max:255',
             'vote_average' => 'nullable|numeric|min:0|max:10',
             'prequel' => 'nullable|exists:animes,id',
             'sequel' => 'nullable|exists:animes,id',
-            'related' => 'nullable|string|max:255',
+            'related' => 'nullable|string|max:150',
             'views' => 'nullable|integer|min:0',
             'views_app' => 'nullable|integer|min:0',
             'isTopic' => 'nullable|boolean',
             'mal_id' => 'nullable|integer|min:0',
             'tmdb_id' => 'nullable|integer|min:0',
-            'short_name' => 'nullable|string|max:255|unique:animes,short_name',
+            'short_name' => 'nullable|string|max:30|unique:animes,short_name',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required' => __('animes.validation.name.required'),
-            'name.string' => __('animes.validation.name.string'),
-            'name.max' => __('animes.validation.name.max'),
+            'name.required' => 'El nombre del anime es obligatorio.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
+            'name.max' => 'El nombre no debe superar los 220 caracteres.',
 
-            'name_alternative.string' => __('animes.validation.name_alternative.string'),
-            'name_alternative.max' => __('animes.validation.name_alternative.max'),
+            'name_alternative.string' => 'El nombre alternativo debe ser una cadena de texto.',
+            'name_alternative.max' => 'El nombre alternativo no debe superar los 350 caracteres.',
 
-            'slug.string' => __('animes.validation.slug.string'),
-            'slug.max' => __('animes.validation.slug.max'),
+            'slug.string' => 'El slug debe ser una cadena de texto.',
+            'slug.max' => 'El slug no debe superar los 220 caracteres.',
 
-            'banner.string' => __('animes.validation.banner.string'),
-            'banner.max' => __('animes.validation.banner.max'),
+            'banner.string' => 'El banner debe ser una cadena de texto.',
+            'banner.max' => 'El banner no debe superar los 220 caracteres.',
 
-            'poster.string' => __('animes.validation.poster.string'),
-            'poster.max' => __('animes.validation.poster.max'),
+            'poster.string' => 'El póster debe ser una cadena de texto.',
+            'poster.max' => 'El póster no debe superar los 220 caracteres.',
 
-            'overview.string' => __('animes.validation.overview.string'),
+            'overview.string' => 'La sinopsis debe ser una cadena de texto.',
 
-            'aired.date' => __('animes.validation.aired.date'),
+            'aired.date' => 'La fecha de emisión debe ser una fecha válida.',
 
-            'type.string' => __('animes.validation.type.string'),
-            'type.in' => __('animes.validation.type.in'),
+            'type.string' => 'El tipo debe ser una cadena de texto.',
+            'type.in' => 'El tipo seleccionado no es válido. Debe ser TV, Movie, OVA, ONA o Special.',
 
-            'status.integer' => __('animes.validation.status.integer'),
-            'status.in' => __('animes.validation.status.in'),
+            'status.integer' => 'El estado debe ser un número entero.',
+            'status.in' => 'El estado seleccionado no es válido.',
 
-            'premiered.string' => __('animes.validation.premiered.string'),
-            'premiered.max' => __('animes.validation.premiered.max'),
+            'premiered.string' => 'La temporada debe ser una cadena de texto.',
+            'premiered.max' => 'La temporada no debe superar los 15 caracteres.',
 
-            'broadcast.string' => __('animes.validation.broadcast.string'),
-            'broadcast.size' => __('animes.validation.broadcast.size'),
+            'broadcast.string' => 'La emisión debe ser una cadena de texto.',
+            'broadcast.size' => 'La emisión debe contener exactamente 1 carácter.',
 
-            'genres.string' => __('animes.validation.genres.string'),
-            'genres.max' => __('animes.validation.genres.max'),
+            'genres.string' => 'Los géneros deben ser una cadena de texto.',
+            'genres.max' => 'Los géneros no deben superar los 255 caracteres.',
 
-            'rating.string' => __('animes.validation.rating.string'),
-            'rating.max' => __('animes.validation.rating.max'),
+            'rating.string' => 'La clasificación debe ser una cadena de texto.',
+            'rating.max' => 'La clasificación no debe superar los 150 caracteres.',
 
-            'popularity.integer' => __('animes.validation.popularity.integer'),
-            'popularity.min' => __('animes.validation.popularity.min'),
+            'popularity.integer' => 'La popularidad debe ser un número entero.',
+            'popularity.min' => 'La popularidad no puede ser negativa.',
 
-            'trailer.url' => __('animes.validation.trailer.url'),
-            'trailer.max' => __('animes.validation.trailer.max'),
+            'trailer.url' => 'El enlace del tráiler debe ser una URL válida.',
+            'trailer.max' => 'El enlace del tráiler no debe superar los 255 caracteres.',
 
-            'vote_average.numeric' => __('animes.validation.vote_average.numeric'),
-            'vote_average.min' => __('animes.validation.vote_average.min'),
-            'vote_average.max' => __('animes.validation.vote_average.max'),
+            'vote_average.numeric' => 'El puntaje debe ser un valor numérico.',
+            'vote_average.min' => 'El puntaje no puede ser menor que 0.',
+            'vote_average.max' => 'El puntaje no puede ser mayor que 10.',
 
-            'prequel.exists' => __('animes.validation.prequel.exists'),
-            'sequel.exists' => __('animes.validation.sequel.exists'),
+            'prequel.exists' => 'El anime precuela seleccionado no existe.',
+            'sequel.exists' => 'El anime secuela seleccionado no existe.',
 
-            'related.string' => __('animes.validation.related.string'),
-            'related.max' => __('animes.validation.related.max'),
+            'related.string' => 'El campo relacionado debe ser una cadena de texto.',
+            'related.max' => 'El campo relacionado no debe superar los 150 caracteres.',
 
-            'views.integer' => __('animes.validation.views.integer'),
-            'views.min' => __('animes.validation.views.min'),
+            'views.integer' => 'Las vistas deben ser un número entero.',
+            'views.min' => 'Las vistas no pueden ser negativas.',
 
-            'views_app.integer' => __('animes.validation.views_app.integer'),
-            'views_app.min' => __('animes.validation.views_app.min'),
+            'views_app.integer' => 'Las vistas en la aplicación deben ser un número entero.',
+            'views_app.min' => 'Las vistas en la aplicación no pueden ser negativas.',
 
-            'isTopic.boolean' => __('animes.validation.isTopic.boolean'),
+            'isTopic.boolean' => 'El campo de tema debe ser verdadero o falso.',
 
-            'mal_id.integer' => __('animes.validation.mal_id.integer'),
-            'mal_id.min' => __('animes.validation.mal_id.min'),
+            'mal_id.integer' => 'El ID de MyAnimeList debe ser un número entero.',
+            'mal_id.min' => 'El ID de MyAnimeList no puede ser negativo.',
 
-            'tmdb_id.integer' => __('animes.validation.tmdb_id.integer'),
-            'tmdb_id.min' => __('animes.validation.tmdb_id.min'),
+            'tmdb_id.integer' => 'El ID de TMDB debe ser un número entero.',
+            'tmdb_id.min' => 'El ID de TMDB no puede ser negativo.',
 
-            'short_name.string' => __('animes.validation.short_name.string'),
-            'short_name.max' => __('animes.validation.short_name.max'),
-            'short_name.unique' => __('animes.validation.short_name.unique'),
+            'short_name.string' => 'El nombre corto debe ser una cadena de texto.',
+            'short_name.max' => 'El nombre corto no debe superar los 30 caracteres.',
+            'short_name.unique' => 'El nombre corto ya está registrado.',
         ];
     }
 }

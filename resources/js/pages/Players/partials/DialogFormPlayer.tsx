@@ -1,5 +1,3 @@
-'use client';
-
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -149,6 +147,7 @@ export function DialogFormPlayer({
                             onChange={(e) => form.setData('code', e.target.value)}
                             placeholder={'Ingresa un enlace'}
                             required
+                            autoFocus
                         />
                         <InputError message={form.errors.code} className="text-xs" />
                     </div>

@@ -15,6 +15,7 @@ import { shortenText } from '@/utils/text';
 import { Edit2, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { DialogCreateMultiplePlayers } from './partials/DialogCreateMultiplePlayers';
 import { DialogDeletePlayer } from './partials/DialogDeletePlayer';
 import { DialogFormPlayer } from './partials/DialogFormPlayer';
 import { getPlayerColumns } from './players-columns';
@@ -37,6 +38,7 @@ export default function Index({
 
     const [modals, setModals] = useState({
         create: false,
+        createMultiple: false,
         edit: { open: false, player: null as PlayerData | null },
         delete: { open: false, player: null as PlayerData | null },
     });
@@ -102,6 +104,9 @@ export default function Index({
                     </div>
                     <div className="flex items-center space-x-2">
                         <Button onClick={() => handleModal('create', true)}>Crear reproductor</Button>
+                        {/* <Button variant="secondary" onClick={() => handleModal('createMultiple', true, null)}>
+                            Crear reproductores
+                        </Button> */}
                         <ClearCacheButton
                             routeName={'cache.players.clear'}
                             labelKey={'players'}
@@ -127,6 +132,16 @@ export default function Index({
                     episodeId={episode.id}
                     open={modals.create}
                     setOpen={(open) => handleModal('create', open)}
+                    servers={servers}
+                />
+            )}
+
+            {modals.createMultiple && (
+                <DialogCreateMultiplePlayers
+                    animeId={anime.id}
+                    episodeId={episode.id}
+                    open={modals.createMultiple}
+                    setOpen={(open) => handleModal('createMultiple', open)}
                     servers={servers}
                 />
             )}
