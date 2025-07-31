@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Link } from '@inertiajs/react';
 
 interface FilterField {
     field: string;
@@ -177,23 +178,20 @@ export function DataTable<TData, TValue>({
                             table.getRowModel().rows.map((row) => {
                                 const rowLink = getRowLink?.(row.original);
                                 return (
-                                    <TableRow
-                                        key={row.id}
-                                        className={rowLink ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
-                                        onClick={() => {
-                                            if (rowLink) window.location.href = rowLink;
-                                        }}
-                                    >
+                                    <TableRow key={row.id} className={rowLink ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}>
                                         {row.getVisibleCells().map((cell) => {
                                             const isActions = cell.column.id === 'actions';
                                             return (
-                                                <TableCell
-                                                    key={cell.id}
-                                                    onClick={(e) => {
-                                                        if (isActions) e.stopPropagation();
-                                                    }}
-                                                >
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                <TableCell key={cell.id}>
+                                                    {isActions ? (
+                                                        flexRender(cell.column.columnDef.cell, cell.getContext())
+                                                    ) : rowLink ? (
+                                                        <Link href={rowLink} className="block h-full w-full" preserveScroll>
+                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                        </Link>
+                                                    ) : (
+                                                        flexRender(cell.column.columnDef.cell, cell.getContext())
+                                                    )}
                                                 </TableCell>
                                             );
                                         })}

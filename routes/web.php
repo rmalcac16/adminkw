@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Animes\AnimeController;
+use App\Http\Controllers\Animes\AnimeSyncController;
 use App\Http\Controllers\CacheController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Episodes\EpisodeController;
@@ -23,8 +24,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::resource('genres', GenreController::class)->only(['index', 'store', 'update', 'destroy'])->names('genres');
+
+    // ANIMES
+    Route::get('animes/sync-mal', [AnimeSyncController::class, 'index'])->name('animes.sync-mal');
+    Route::post('animes/sync-mal/run', [AnimeSyncController::class, 'run'])->name('animes.sync-mal.run');
+
     Route::resource('animes', AnimeController::class);
     Route::resource('servers', ServerController::class)->names('servers')->only(['index', 'store', 'update', 'destroy']);
+
 
     Route::post('animes/{anime}/episodes/upload', [EpisodeController::class, 'upload'])->name('episodes.upload');
     Route::post('animes/{anime}/episodes/generate-players', [EpisodeController::class, 'generatePlayers'])->name('episodes.generate-players');
