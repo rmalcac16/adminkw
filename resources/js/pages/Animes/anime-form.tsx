@@ -20,7 +20,6 @@ import { AnimeDialogSyncMal } from './anime-dialog-sync-mal';
 
 export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' | 'edit'; anime?: AnimeData; genres: GenreData[] }) {
     const { __ } = useLang();
-
     const isEdit = !!anime;
 
     const { data, setData, errors, post, put, processing, reset } = useForm({
@@ -77,18 +76,14 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
-
         if (processing) return;
-
         if (type === 'edit' && !anime?.id) {
             toast.error(__('animes.update.error_no_id'));
             return;
         }
-
         const onSuccess = () => {
             reset();
         };
-
         if (isEdit) {
             put(route('animes.update', anime!.id), { onSuccess });
         } else {
@@ -132,6 +127,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                         </Label>
                     </div>
                 </div>
+
                 <div className="flex flex-col gap-2 lg:col-span-5">
                     <Label htmlFor="slug">{__('animes.labels.slug')}</Label>
                     <Input
@@ -143,6 +139,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     <p className="line-clamp-1 text-xs overflow-ellipsis text-muted-foreground">{__('animes.labels.slug_help')}</p>
                     <InputError message={errors.slug} className="text-xs" />
                 </div>
+
                 <div className="flex flex-col gap-2 lg:col-span-2">
                     <Label htmlFor="short_name">{__('animes.labels.short_name')}</Label>
                     <Input
@@ -153,6 +150,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     />
                     <InputError message={errors.short_name} className="text-xs" />
                 </div>
+
                 <div className="flex flex-col gap-2 lg:col-span-6">
                     <Label htmlFor="name_alternative">{__('animes.labels.name_alternative')}</Label>
                     <AlternativeNamesInputTags
@@ -162,6 +160,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     />
                     <InputError message={errors.name_alternative} className="text-xs" />
                 </div>
+
                 <div className="flex flex-col gap-2 lg:col-span-2">
                     <Label htmlFor="type">{__('animes.labels.type')}</Label>
                     <Select value={data.type} onValueChange={(value) => setData('type', value)} required>
@@ -178,6 +177,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     </Select>
                     <InputError message={errors.type} className="text-xs" />
                 </div>
+
                 <div className="flex flex-col gap-2 lg:col-span-2">
                     <Label htmlFor="status">{__('animes.labels.status')}</Label>
                     <Select value={data.status?.toString()} onValueChange={(value) => setData('status', value)}>
@@ -194,6 +194,7 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     </Select>
                     <InputError message={errors.status} className="text-xs" />
                 </div>
+
                 <div className="flex flex-col gap-2 lg:col-span-2">
                     <Label htmlFor="aired">{__('animes.labels.aired')}</Label>
                     <DatePicker date={data.aired} onChange={(date) => setData('aired', date)} placeholder={__('animes.placeholders.aired')} />
@@ -323,10 +324,14 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     <Label htmlFor="prequel">{__('animes.labels.prequel')}</Label>
                     <Input
                         id="prequel"
-                        type="number"
-                        min={0}
-                        value={data.prequel}
-                        onChange={(e) => setData('prequel', Number(e.target.value))}
+                        type="text"
+                        value={data.prequel || ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '' || /^[1-9]\d*$/.test(val)) {
+                                setData('prequel', val === '' ? '' : Number(val));
+                            }
+                        }}
                         placeholder={__('animes.placeholders.prequel')}
                     />
                     <InputError message={errors.prequel} className="text-xs" />
@@ -336,10 +341,14 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     <Label htmlFor="sequel">{__('animes.labels.sequel')}</Label>
                     <Input
                         id="sequel"
-                        type="number"
-                        min={0}
-                        value={data.sequel}
-                        onChange={(e) => setData('sequel', Number(e.target.value))}
+                        type="text"
+                        value={data.sequel || ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '' || /^[1-9]\d*$/.test(val)) {
+                                setData('sequel', val === '' ? '' : Number(val));
+                            }
+                        }}
                         placeholder={__('animes.placeholders.sequel')}
                     />
                     <InputError message={errors.sequel} className="text-xs" />
@@ -349,12 +358,14 @@ export function AnimeForm({ type = 'create', anime, genres }: { type?: 'create' 
                     <AnimeDialogSyncMal anime={data} setData={setData} genres={genres} />
                 </div>
             </div>
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
                 <div className="col-span-12 flex flex-col gap-2 md:col-span-6">
                     <Label htmlFor="genres">{__('animes.labels.genres')}</Label>
                     <GenresSelectTags allGenres={genres} value={data.genres ?? ''} onChange={(val) => setData('genres', val ?? '')} />
                     <InputError message={errors.genres} className="text-xs" />
                 </div>
+
                 <div className="col-span-12 flex flex-col gap-2 md:col-span-6">
                     <Label htmlFor="related">{__('animes.labels.related')}</Label>
                     <RelatedInputTags

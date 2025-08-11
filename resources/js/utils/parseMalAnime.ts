@@ -5,8 +5,11 @@ export function parseMalAnime(mal: any, allGenres: GenreData[]) {
     // Títulos principales y alternativos
     // ----------------------------
     const title = mal.title || '';
+    const cleanTitle = (title: string) => title.replace(/,/g, ''); // o reemplaza por otro char
+
     const alternatives = [...(mal.alternative_titles?.synonyms || []), mal.alternative_titles?.en, mal.alternative_titles?.ja]
         .filter(Boolean)
+        .map(cleanTitle) // limpiar comas internas
         .join(',');
 
     const englishTitle = mal.alternative_titles?.en || '';
